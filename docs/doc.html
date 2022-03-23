@@ -1,0 +1,1250 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2022-03-22 Tue 11:59 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>LTPL : Loki Text Processing Language Manual</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="Michael" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2020 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        displayAlign: "center",
+        displayIndent: "0em",
+
+        "HTML-CSS": { scale: 100,
+                        linebreaks: { automatic: "false" },
+                        webFont: "TeX"
+                       },
+        SVG: {scale: 100,
+              linebreaks: { automatic: "false" },
+              font: "TeX"},
+        NativeMML: {scale: 100},
+        TeX: { equationNumbers: {autoNumber: "AMS"},
+               MultLineWidth: "85%",
+               TagSide: "right",
+               TagIndent: ".8em"
+             }
+});
+</script>
+<script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_HTML"></script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">LTPL : Loki Text Processing Language Manual</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org7ead517">1. Introduction</a>
+<ul>
+<li><a href="#org650afac">1.1. What Is This Exactly ?</a></li>
+<li><a href="#org473f581">1.2. Who Is This For ?</a></li>
+<li><a href="#org909f0ea">1.3. Why Does This Exist ?</a></li>
+<li><a href="#org1d90d12">1.4. What This Tool Is</a>
+<ul>
+<li><a href="#org7322781">1.4.1. It is a Utility For Text Manipulation</a></li>
+</ul>
+</li>
+<li><a href="#org39f9624">1.5. What This Tool Is Not</a>
+<ul>
+<li><a href="#org49b4eb9">1.5.1. It Is Not <i>Complete</i> Replacement For Awk.</a></li>
+<li><a href="#orgcb65483">1.5.2. It Is Not A Scripting Language</a></li>
+</ul>
+</li>
+<li><a href="#org2591a8d">1.6. Why The Cryptic Syntax</a></li>
+</ul>
+</li>
+<li><a href="#orgbec2bee">2. Essentals</a>
+<ul>
+<li><a href="#org644ca16">2.1. Reader Directives</a>
+<ul>
+<li><a href="#org23ef30a">2.1.1. What Is A Reader Directive</a></li>
+</ul>
+</li>
+<li><a href="#org33bb03a">2.2. Objects</a>
+<ul>
+<li><a href="#orgd41f7ee">2.2.1. What Are Objects ?</a></li>
+<li><a href="#orgfedcbb2">2.2.2. Object Primitives</a></li>
+<li><a href="#org3cf7985">2.2.3. Fields And Implict Objects</a></li>
+<li><a href="#orge8f600b">2.2.4. User Defined Objects</a></li>
+<li><a href="#org92481f4">2.2.5. Assignement</a></li>
+<li><a href="#org85aac52">2.2.6. Object Arrays And Subfields</a></li>
+</ul>
+</li>
+<li><a href="#orged87691">2.3. Actions</a>
+<ul>
+<li><a href="#org97c386f">2.3.1. What Is An Action</a></li>
+<li><a href="#org89fb06d">2.3.2. Actions Predefined</a></li>
+<li><a href="#org2ca1e21">2.3.3. Why Can't I Define My Own Actions</a></li>
+<li><a href="#org792e9bd">2.3.4. Possible Actions</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org385a356">3. Implentation Details</a></li>
+<li><a href="#org9c1af75">4. Examples</a></li>
+<li><a href="#orgae63156">5. Benchmarks</a></li>
+<li><a href="#org24a1baa">6. Grammar BNF</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org7ead517" class="outline-2">
+<h2 id="org7ead517"><span class="section-number-2">1</span> Introduction</h2>
+<div class="outline-text-2" id="text-1">
+</div>
+<div id="outline-container-org650afac" class="outline-3">
+<h3 id="org650afac"><span class="section-number-3">1.1</span> What Is This Exactly ?</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+LTPL is a declaritive text processing and manipulation utility that specializes in making common
+text processing tasks as easily and tersely as possible.
+</p>
+</div>
+</div>
+<div id="outline-container-org473f581" class="outline-3">
+<h3 id="org473f581"><span class="section-number-3">1.2</span> Who Is This For ?</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+This is a tool mainly for programmers and users who require ridgit formated text output. Specifically targeting
+those who would traditionally use awk to do so.
+</p>
+</div>
+</div>
+<div id="outline-container-org909f0ea" class="outline-3">
+<h3 id="org909f0ea"><span class="section-number-3">1.3</span> Why Does This Exist ?</h3>
+<div class="outline-text-3" id="text-1-3">
+<p>
+I wanted a utility for text processing that was more flexible than Sed but more tearse than awk that
+that didnt contain the C-isms that was carried over as bagage from the Bell Labs Unix style thought process when designing awk.
+</p>
+</div>
+</div>
+<div id="outline-container-org1d90d12" class="outline-3">
+<h3 id="org1d90d12"><span class="section-number-3">1.4</span> What This Tool Is</h3>
+<div class="outline-text-3" id="text-1-4">
+</div>
+<div id="outline-container-org7322781" class="outline-4">
+<h4 id="org7322781"><span class="section-number-4">1.4.1</span> It is a Utility For Text Manipulation</h4>
+<div class="outline-text-4" id="text-1-4-1">
+<p>
+LTPL is more a utility along the lines of sed and awk than an actual language you would write in a file.
+It ment to be embedded in bash scripts and to be used either along side or be more versitle than more traditional tools.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org39f9624" class="outline-3">
+<h3 id="org39f9624"><span class="section-number-3">1.5</span> What This Tool Is Not</h3>
+<div class="outline-text-3" id="text-1-5">
+</div>
+<div id="outline-container-org49b4eb9" class="outline-4">
+<h4 id="org49b4eb9"><span class="section-number-4">1.5.1</span> It Is Not <i>Complete</i> Replacement For Awk.</h4>
+<div class="outline-text-4" id="text-1-5-1">
+<p>
+I am only comparing my language periodically to awk as the closest parallel of the language that exists and is in relitive popular use today.
+I am aware that awk is a more traditional language with a much more familar syntax that is ment to write programs and scripts that may be run from a file or piped in from another program.
+however the purpose of LTPL is explicitly for reading in and displaying data.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgcb65483" class="outline-4">
+<h4 id="orgcb65483"><span class="section-number-4">1.5.2</span> It Is Not A Scripting Language</h4>
+<div class="outline-text-4" id="text-1-5-2">
+<p>
+This tool is not for all intensive purposes is not a scrihpting language nor should it ever be used as one.
+LTPL is a tearse and simple text processing utility and nothing more
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org2591a8d" class="outline-3">
+<h3 id="org2591a8d"><span class="section-number-3">1.6</span> Why The Cryptic Syntax</h3>
+<div class="outline-text-3" id="text-1-6">
+<p>
+LTPL's syntax and grammar is very simple aiming and being simple to use in a terminal enviroment.
+With this consideration taken a APL or Regular expression like syntax was considerd appropriate for a speedy interactive usage that I was trying to achieve.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgbec2bee" class="outline-2">
+<h2 id="orgbec2bee"><span class="section-number-2">2</span> Essentals</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+There are four core concepts exibit themselves in LTPL.
+The language its self is rather simple which makes it a very powerful tool for parsing text.
+</p>
+
+<ul class="org-ul">
+<li>Reader Directives</li>
+<li>Actions</li>
+<li>Objects</li>
+<li>Regular Expressions</li>
+</ul>
+</div>
+
+<div id="outline-container-org644ca16" class="outline-3">
+<h3 id="org644ca16"><span class="section-number-3">2.1</span> Reader Directives</h3>
+<div class="outline-text-3" id="text-2-1">
+</div>
+<div id="outline-container-org23ef30a" class="outline-4">
+<h4 id="org23ef30a"><span class="section-number-4">2.1.1</span> What Is A Reader Directive</h4>
+<div class="outline-text-4" id="text-2-1-1">
+<p>
+A Reader Directive is a command to the intepreter that directs the manner in which the input file will be parsed.
+</p>
+
+<p>
+There are two main Reader Directive types in LTPL.
+</p>
+<ul class="org-ul">
+<li>Parsing Directives</li>
+<li>Range Specifiers</li>
+</ul>
+</div>
+
+<ol class="org-ol">
+<li><a id="org662bed0"></a><b>Parsing Directives</b><br />
+<div class="outline-text-5" id="text-2-1-1-1">
+<p>
+Parsing Directives which controls how the file is able to be read.
+there are a variety of different ways text can be formatted. 
+It is not always appropriate to read file left to right.
+</p>
+
+<p>
+<i>and yes im sorry ltpl is 1 indexed throught the language, but there is a very good reason</i>
+</p>
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Reader Directives</th>
+<th scope="col" class="org-left">Parse Description</th>
+<th scope="col" class="org-left">$FS Default</th>
+<th scope="col" class="org-left">Starting Cursor Position</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">==</td>
+<td class="org-left">parse left to right</td>
+<td class="org-left">" " Space</td>
+<td class="org-left">(1,1)</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">&vert; &vert;</td>
+<td class="org-left">column by column</td>
+<td class="org-left">"\n" Newline</td>
+<td class="org-left">(1,1)</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">^&vert;</td>
+<td class="org-left">column by column</td>
+<td class="org-left">"\n" Newline</td>
+<td class="org-left">(1,n)</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">--</td>
+<td class="org-left">Read a single line</td>
+<td class="org-left">" " Space</td>
+<td class="org-left">(1,n)</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">&lt;=</td>
+<td class="org-left">read right to left</td>
+<td class="org-left">" " Space</td>
+<td class="org-left">(n,1)</td>
+</tr>
+</tbody>
+</table>
+<p>
+<i>where n is the number of elements in that row or column</i>
+</p>
+
+
+<p>
+Here is an example on how reader directives can be used with some formated input
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">$ ls -l
+
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Desktop 
+drwxr-xr-x 2 user user  4096 Feb  4 00:36 Documents
+drwxr-xr-x 3 user user  4096 Feb  6 23:16 Downloads
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Music 
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Pictures
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Public 
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Templates 
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Videos
+
+$ ls -l | ltpl "==$5[*:1024][p]."
+Output: 
+
+4194304 
+4194304 
+4194304 
+4194304 
+4194304 
+4194304
+4194304
+4194304 
+</pre>
+</div>
+<p>
+<i>where we are getting the 5th element and multiplying it by 1024 and printing the output</i>
+</p>
+
+<p>
+Another way to achieve the same behavior but more efficently would be to do 
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">$ ls -l
+
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Desktop 
+drwxr-xr-x 2 user user  4096 Feb  4 00:36 Documents
+drwxr-xr-x 3 user user  4096 Feb  6 23:16 Downloads
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Music 
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Pictures
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Public 
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Templates 
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Videos
+
+$ ls -l | ltpl "||$5[*:1024][p]."
+
+4194304 
+4194304 
+4194304 
+4194304 
+4194304 
+4194304
+4194304
+4194304 
+</pre>
+</div>
+<p>
+The only difference here from the example above is the way that the interpter reads the information.
+instead of reading every single field starting with <i>drwxr-xr-2</i> and ending when we find $5 which in this case is 4096.
+we can get entire columns of text just by reading by column.
+</p>
+
+<p>
+Examples of the other reader directives being used can be found at &#x2026;. (havent made a place for it yet)
+</p>
+</div>
+</li>
+
+<li><a id="orgba7e1f5"></a><b>Range Specifiers</b><br />
+<div class="outline-text-5" id="text-2-1-1-2">
+<p>
+There are a lot of times we want to ommit certain places where we have junk in a file. 
+By junk I dont really mean garbage in the sense that its not important but I mean
+that its not applicable for what we need.
+</p>
+
+<p>
+you can achieve this by using Range Specifiers which controls what field the given lines of the input will be read.
+</p>
+
+<p>
+A Position Specifier may be used in combitation with a Parser Directive to give more flexibilty to the user;
+detailing what subset of data of the input that will be read.
+</p>
+
+<p>
+given the following syntax.<br />
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">"||0,1"
+</pre>
+</div>
+<p>
+<i>which reads each column skipping the first column entirely</i>
+</p>
+
+<p>
+A practical application to get all of the numbers on line 5 would be
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">$ cat file.txt
+John Doe
+March 21st, 2022
+John_The_Doe@hotmail.com (because I feel hotmail is funny)
+
+10 20 30 40 50
+hello good bye
+
+$ ltpl file.txt "--5,5[p]"
+10 20 30 40 50
+</pre>
+</div>
+<p>
+<i>where it reads only one singular line of text at line 5 and prints it</i>
+</p>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org33bb03a" class="outline-3">
+<h3 id="org33bb03a"><span class="section-number-3">2.2</span> Objects</h3>
+<div class="outline-text-3" id="text-2-2">
+</div>
+<div id="outline-container-orgd41f7ee" class="outline-4">
+<h4 id="orgd41f7ee"><span class="section-number-4">2.2.1</span> What Are Objects ?</h4>
+<div class="outline-text-4" id="text-2-2-1">
+<p>
+Objects in ltpl really are one of the most complex things in the entire language.
+but even though they are complex they are also rather simple in structure.
+Objects are hiearchical and able to be indexed quite simply as well.
+</p>
+
+<p>
+\Tree [.S a [.NP b c ]    d ]
+\Tree [.S a [    b c ].NP d ]
+</p>
+</div>
+</div>
+<div id="outline-container-orgfedcbb2" class="outline-4">
+<h4 id="orgfedcbb2"><span class="section-number-4">2.2.2</span> Object Primitives</h4>
+<div class="outline-text-4" id="text-2-2-2">
+<p>
+Object Primitives are a what you would call literals in any other language but there is a quirk of all objects in ltpl.
+every object has children represented as numbers. By default you are adressing the children of $0 when refering to lines.
+</p>
+</div>
+</div>
+
+
+<div id="outline-container-org3cf7985" class="outline-4">
+<h4 id="org3cf7985"><span class="section-number-4">2.2.3</span> Fields And Implict Objects</h4>
+<div class="outline-text-4" id="text-2-2-3">
+</div>
+<ol class="org-ol">
+<li><a id="org0dcb4d3"></a>Fields<br />
+<div class="outline-text-5" id="text-2-2-3-1">
+<p>
+Fields are the way that LTPL treats columns of text that are seperated by the $FS implicit object.
+</p>
+</div>
+</li>
+<li><a id="org12fdedc"></a>Implicit Objects<br />
+<div class="outline-text-5" id="text-2-2-3-2">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Name</th>
+<th scope="col" class="org-left">Description</th>
+<th scope="col" class="org-left">Type</th>
+<th scope="col" class="org-left">&#xa0;</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">$0</td>
+<td class="org-left">The 0th field refering to the whole line of text. That contains an object array of</td>
+<td class="org-left">Object Array</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">$n</td>
+<td class="org-left">The $nth field that refers to an object that is broken up into fields by the $fs</td>
+<td class="org-left">Integer Object</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">$FS</td>
+<td class="org-left">the delimiting character(s) that designantes the seperation of new tokens by a user defined or LTPL specified token</td>
+<td class="org-left">String Object</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">$CL</td>
+<td class="org-left">the current line being read</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">$PL</td>
+<td class="org-left">previous line read</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">$NL</td>
+<td class="org-left">the next line to be read.</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">$NLR</td>
+<td class="org-left">the number of lines that have been read.</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">$NTR</td>
+<td class="org-left">the number of lines that need to be read.</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">$RED</td>
+<td class="org-left">An object</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">$GREEN</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">$BLUE</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">$BLACK</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">$WHITE</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">$CYAN</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">$MAGENTA</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">$YELLOW</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">$PURPLE</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">$PINK</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">$ORANGE</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+</table>
+
+
+<p>
+<i>where n is the number of fields</i>
+</p>
+</div>
+</li>
+</ol>
+</div>
+
+<div id="outline-container-orge8f600b" class="outline-4">
+<h4 id="orge8f600b"><span class="section-number-4">2.2.4</span> User Defined Objects</h4>
+<div class="outline-text-4" id="text-2-2-4">
+<p>
+Objects In LTPL are able to be created by referancing a nonexistant object by using the $.
+typing the example nonsensecal case "$bar" is a proper object declaration.
+</p>
+</div>
+</div>
+<div id="outline-container-org92481f4" class="outline-4">
+<h4 id="org92481f4"><span class="section-number-4">2.2.5</span> Assignement</h4>
+<div class="outline-text-4" id="text-2-2-5">
+<p>
+Defining new variables along with reassigning existing ones are core parts of any programming language (except for the haskell purists out there)
+LTPL is no different but has a quirk to do so.
+</p>
+</div>
+<ol class="org-ol">
+<li><a id="orgaa11658"></a>Examples<br />
+<div class="outline-text-5" id="text-2-2-5-1">
+<p>
+LTPL example.txt "==$bar[10]."<br />
+LTPL example.txt "==$foo."<br />
+<i>both of which are valid instances of objects where foo is assigned to an empty string by default and bar is assigned to 10</i> <br />
+</p>
+
+<p>
+$ ls <br />
+</p>
+
+<p>
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Desktop <br />
+drwxr-xr-x 2 user user  4096 Feb  4 00:36 Documents <br />
+drwxr-xr-x 3 user user  4096 Feb  6 23:16 Downloads <br />
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Music <br />
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Pictures <br />
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Public <br />
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Templates <br />
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Videos <br />
+</p>
+
+<p>
+ls -l | LTPL "==$3[~=$3]$foo[p].
+</p>
+
+<p>
+Output:
+</p>
+
+<p>
+drwxr-xr-x 2 user 4096 Jan 20 19:42 Desktop <br />
+drwxr-xr-x 2 user 4096 Feb  4 00:36 Documents <br />
+drwxr-xr-x 3 user 4096 Feb  6 23:16 Downloads <br />
+drwxr-xr-x 2 user 4096 Jan 20 19:42 Music <br />
+drwxr-xr-x 2 user 4096 Jan 20 19:42 Pictures <br />
+drwxr-xr-x 2 user 4096 Jan 20 19:42 Public <br />
+drwxr-xr-x 2 user 4096 Jan 20 19:42 Templates <br />
+drwxr-xr-x 2 user 4096 Jan 20 19:42 Videos <br />
+</p>
+</div>
+</li>
+</ol>
+</div>
+
+<div id="outline-container-org85aac52" class="outline-4">
+<h4 id="org85aac52"><span class="section-number-4">2.2.6</span> Object Arrays And Subfields</h4>
+<div class="outline-text-4" id="text-2-2-6">
+<p>
+Subfields and object arrays are more or less equvilent. with the only real difference is in what is being refered. to put it simply:
+</p>
+
+<p>
+if it is a field it will be refered to as a subfield.
+if it is a user defined object it is refered to as an object array.
+<i>The encomapssing term between the two is object array</i>
+</p>
+</div>
+<ol class="org-ol">
+<li><a id="orgd73bd0c"></a>Refering To  Object Arrays<br />
+<div class="outline-text-5" id="text-2-2-6-1">
+<p>
+Below is a dummy file with that we will parse.<br />
+<br />
+Example.txt:<br />
+hello world this is a tjest.
+</p>
+
+<p>
+if you notice there is a spelling error<br />
+you can fix such a minute error like so<br />
+</p>
+
+<p>
+LTPL Example.txt "&#x2013;$6$2[~=$6$2]$6$1[&gt;&gt;]$0[p]."<br />
+<i>where $6 is the 6th field while refering to the 2nd object field. deleting the object in said field and moving the object on the left next to it over where the previous object resided</i>
+</p>
+</div>
+</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-orged87691" class="outline-3">
+<h3 id="orged87691"><span class="section-number-3">2.3</span> Actions</h3>
+<div class="outline-text-3" id="text-2-3">
+</div>
+<div id="outline-container-org97c386f" class="outline-4">
+<h4 id="org97c386f"><span class="section-number-4">2.3.1</span> What Is An Action</h4>
+<div class="outline-text-4" id="text-2-3-1">
+<p>
+An action is the primary enact changes to Objects. they are syntactically represented within [].
+</p>
+</div>
+<ol class="org-ol">
+<li><a id="orgf534b74"></a>Example<br />
+<div class="outline-text-5" id="text-2-3-1-1">
+<p>
+$ ls -l <br />
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Desktop <br />
+drwxr-xr-x 2 user user  4096 Feb  4 00:36 Documents <br />
+drwxr-xr-x 3 user user  4096 Feb  6 23:16 Downloads <br />
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Music <br />
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Pictures <br />
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Public <br />
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Templates <br />
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Videos <br />
+</p>
+
+<p>
+ls -l | LTPL "==$6[p]" <br />
+</p>
+
+<p>
+Output: <br />
+Jan <br />
+Feb <br />
+Feb <br />
+Jan <br />
+Jan <br />
+Jan <br />
+Jan <br />
+Jan <br />
+</p>
+</div>
+</li>
+</ol>
+</div>
+
+<div id="outline-container-org89fb06d" class="outline-4">
+<h4 id="org89fb06d"><span class="section-number-4">2.3.2</span> Actions Predefined</h4>
+<div class="outline-text-4" id="text-2-3-2">
+</div>
+<ol class="org-ol">
+<li><a id="org4e21e12"></a>Output And More Output<br />
+<div class="outline-text-5" id="text-2-3-2-1">
+<p>
+Keeping within the bound of the promise that this is not a scripting language There is no way to prompt users for input what so ever.
+In LTPL There a variety of different mechinisms that the user to write to a file of their choice.
+</p>
+</div>
+<ol class="org-ol">
+<li><a id="orgc6ec7f6"></a>Writing To Files<br />
+<div class="outline-text-6" id="text-2-3-2-1-1">
+<p>
+What Would a text processing language be with out being able to save the manipulated text to files write to files.
+</p>
+</div>
+</li>
+</ol>
+</li>
+</ol>
+</div>
+<div id="outline-container-org2ca1e21" class="outline-4">
+<h4 id="org2ca1e21"><span class="section-number-4">2.3.3</span> Why Can't I Define My Own Actions</h4>
+<div class="outline-text-4" id="text-2-3-3">
+<p>
+well there is a simple answer to that. LTPL is not a scripting language. If you feel you need to define your own actions to make a certain action easier. you should look at some other language.
+consider using AWK or perl. heck sed can be useful in some circumstances. 
+</p>
+</div>
+</div>
+<div id="outline-container-org792e9bd" class="outline-4">
+<h4 id="org792e9bd"><span class="section-number-4">2.3.4</span> Possible Actions</h4>
+<div class="outline-text-4" id="text-2-3-4">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Name</th>
+<th scope="col" class="org-left">Symbolic Name</th>
+<th scope="col" class="org-left">Description</th>
+<th scope="col" class="org-left">Possible Arguments</th>
+<th scope="col" class="org-left">Examples</th>
+<th scope="col" class="org-left">program description</th>
+<th scope="col" class="org-left">&#xa0;</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">print</td>
+<td class="org-left">p</td>
+<td class="org-left">Prints an object to stdout</td>
+<td class="org-left">p -red -green -blue &vert; none</td>
+<td class="org-left">&#x2014;$1[p 255,0,0].</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">write</td>
+<td class="org-left">w</td>
+<td class="org-left">writes objects to a file</td>
+<td class="org-left">w -filename &vert; -filename</td>
+<td class="org-left">&#x2014;$0[w file.txt].</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">filter</td>
+<td class="org-left">~</td>
+<td class="org-left">removes if condition is true</td>
+<td class="org-left">~ -logical operator -object</td>
+<td class="org-left">&#x2014;$0[~=10][p].</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">cast to type</td>
+<td class="org-left">-&gt;</td>
+<td class="org-left">given an object it converts it to the type of a given object</td>
+<td class="org-left">-&gt; -object</td>
+<td class="org-left">&#x2014;$1[-&gt; 10][p]</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">ternary</td>
+<td class="org-left">?</td>
+<td class="org-left">does the next action if true the other if false</td>
+<td class="org-left">? - logical operator object</td>
+<td class="org-left">&#x2014;$1[? = 10]Success[p 0 255,0]fail[p 255,0,0].</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">italic</td>
+<td class="org-left">i</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">none</td>
+<td class="org-left">&#x2014;$0[i][p].</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">bold</td>
+<td class="org-left">b</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">none</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">underline</td>
+<td class="org-left">_</td>
+<td class="org-left">underlines an object</td>
+<td class="org-left">none</td>
+<td class="org-left">&#x2014;$0[_][p].</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">highlight</td>
+<td class="org-left">#</td>
+<td class="org-left">highlights an object</td>
+<td class="org-left">none</td>
+<td class="org-left">&#x2014;$0[</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">shift down line</td>
+<td class="org-left">VV</td>
+<td class="org-left">shfits an object down into the line below it.</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">shift up line</td>
+<td class="org-left">^^</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">Swap lines</td>
+</tr>
+
+<tr>
+<td class="org-left">Move Right</td>
+<td class="org-left">&gt;&gt;</td>
+<td class="org-left">shifts an object right by one field replacing the object that inhabited that location</td>
+<td class="org-left">none</td>
+<td class="org-left">&#x2014;$1[&gt;&gt;]$2[p].</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">Move Left</td>
+<td class="org-left">&lt;&lt;</td>
+<td class="org-left">shifts an object left by one field replacing the object that inhabited that location</td>
+<td class="org-left">none</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org385a356" class="outline-2">
+<h2 id="org385a356"><span class="section-number-2">3</span> Implentation Details</h2>
+</div>
+<div id="outline-container-org9c1af75" class="outline-2">
+<h2 id="org9c1af75"><span class="section-number-2">4</span> Examples</h2>
+</div>
+<div id="outline-container-orgae63156" class="outline-2">
+<h2 id="orgae63156"><span class="section-number-2">5</span> Benchmarks</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+ure Ideas
+</p>
+</div>
+</div>
+<div id="outline-container-org24a1baa" class="outline-2">
+<h2 id="org24a1baa"><span class="section-number-2">6</span> Grammar BNF</h2>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="date">Date: 2/7/22</p>
+<p class="author">Author: Michael</p>
+<p class="date">Created: 2022-03-22 Tue 11:59</p>
+<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>

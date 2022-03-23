@@ -1,0 +1,432 @@
+% Created 2022-03-22 Tue 11:57
+% Intended LaTeX compiler: pdflatex
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{grffile}
+\usepackage{longtable}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{textcomp}
+\usepackage{amssymb}
+\usepackage{capt-of}
+\usepackage{hyperref}
+\author{Michael}
+\date{2/7/22}
+\title{LTPL : Loki Text Processing Language Manual}
+\hypersetup{
+ pdfauthor={Michael},
+ pdftitle={LTPL : Loki Text Processing Language Manual},
+ pdfkeywords={},
+ pdfsubject={},
+ pdfcreator={Emacs 27.1 (Org mode 9.3)}, 
+ pdflang={English}}
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\section{Introduction}
+\label{sec:org8ac106c}
+\subsection{What Is This Exactly ?}
+\label{sec:orgded9922}
+LTPL is a declaritive text processing and manipulation utility that specializes in making common
+text processing tasks as easily and tersely as possible.
+\subsection{Who Is This For ?}
+\label{sec:orgece204b}
+This is a tool mainly for programmers and users who require ridgit formated text output. Specifically targeting
+those who would traditionally use awk to do so.
+\subsection{Why Does This Exist ?}
+\label{sec:org00aa4bc}
+I wanted a utility for text processing that was more flexible than Sed but more tearse than awk that
+that didnt contain the C-isms that was carried over as bagage from the Bell Labs Unix style thought process when designing awk.
+\subsection{What This Tool Is}
+\label{sec:orga2e4cc1}
+\subsubsection{It is a Utility For Text Manipulation}
+\label{sec:orgb96ddb8}
+LTPL is more a utility along the lines of sed and awk than an actual language you would write in a file.
+It ment to be embedded in bash scripts and to be used either along side or be more versitle than more traditional tools.
+\subsection{What This Tool Is Not}
+\label{sec:org77fd879}
+\subsubsection{It Is Not \emph{Complete} Replacement For Awk.}
+\label{sec:orgef9c61d}
+I am only comparing my language periodically to awk as the closest parallel of the language that exists and is in relitive popular use today.
+I am aware that awk is a more traditional language with a much more familar syntax that is ment to write programs and scripts that may be run from a file or piped in from another program.
+however the purpose of LTPL is explicitly for reading in and displaying data.
+
+\subsubsection{It Is Not A Scripting Language}
+\label{sec:org455a8d3}
+This tool is not for all intensive purposes is not a scrihpting language nor should it ever be used as one.
+LTPL is a tearse and simple text processing utility and nothing more
+\subsection{Why The Cryptic Syntax}
+\label{sec:orgd8d66f5}
+LTPL's syntax and grammar is very simple aiming and being simple to use in a terminal enviroment.
+With this consideration taken a APL or Regular expression like syntax was considerd appropriate for a speedy interactive usage that I was trying to achieve.
+\section{Essentals}
+\label{sec:org2638a8d}
+There are four core concepts exibit themselves in LTPL.
+The language its self is rather simple which makes it a very powerful tool for parsing text.
+
+\begin{itemize}
+\item Reader Directives
+\item Actions
+\item Objects
+\item Regular Expressions
+\end{itemize}
+
+\subsection{Reader Directives}
+\label{sec:org9eda990}
+\subsubsection{What Is A Reader Directive}
+\label{sec:org456c31e}
+A Reader Directive is a command to the intepreter that directs the manner in which the input file will be parsed.
+
+There are two main Reader Directive types in LTPL.
+\begin{itemize}
+\item Parsing Directives
+\item Range Specifiers
+\end{itemize}
+
+\begin{enumerate}
+\item \textbf{Parsing Directives}
+\label{sec:org6b08c5c}
+Parsing Directives which controls how the file is able to be read.
+there are a variety of different ways text can be formatted. 
+It is not always appropriate to read file left to right.
+
+\emph{and yes im sorry ltpl is 1 indexed throught the language, but there is a very good reason}
+\begin{center}
+\begin{tabular}{llll}
+\hline
+Reader Directives & Parse Description & \$FS Default & Starting Cursor Position\\
+\hline
+== & parse left to right & " " Space & (1,1)\\
+\hline
+\(\vert{}\) \(\vert{}\) & column by column & "\n" Newline & (1,1)\\
+\hline
+\^{}\(\vert{}\) & column by column & "\n" Newline & (1,n)\\
+\hline
+-- & Read a single line & " " Space & (1,n)\\
+\hline
+<= & read right to left & " " Space & (n,1)\\
+\hline
+\end{tabular}
+\end{center}
+\emph{where n is the number of elements in that row or column}
+
+
+Here is an example on how reader directives can be used with some formated input
+\begin{verbatim}
+$ ls -l
+
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Desktop 
+drwxr-xr-x 2 user user  4096 Feb  4 00:36 Documents
+drwxr-xr-x 3 user user  4096 Feb  6 23:16 Downloads
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Music 
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Pictures
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Public 
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Templates 
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Videos
+
+$ ls -l | ltpl "==$5[*:1024][p]."
+Output: 
+
+4194304 
+4194304 
+4194304 
+4194304 
+4194304 
+4194304
+4194304
+4194304 
+\end{verbatim}
+\emph{where we are getting the 5th element and multiplying it by 1024 and printing the output}
+
+Another way to achieve the same behavior but more efficently would be to do 
+\begin{verbatim}
+$ ls -l
+
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Desktop 
+drwxr-xr-x 2 user user  4096 Feb  4 00:36 Documents
+drwxr-xr-x 3 user user  4096 Feb  6 23:16 Downloads
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Music 
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Pictures
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Public 
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Templates 
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Videos
+
+$ ls -l | ltpl "||$5[*:1024][p]."
+
+4194304 
+4194304 
+4194304 
+4194304 
+4194304 
+4194304
+4194304
+4194304 
+\end{verbatim}
+The only difference here from the example above is the way that the interpter reads the information.
+instead of reading every single field starting with \emph{drwxr-xr-2} and ending when we find \$5 which in this case is 4096.
+we can get entire columns of text just by reading by column.
+
+Examples of the other reader directives being used can be found at \ldots{}. (havent made a place for it yet)
+
+\item \textbf{Range Specifiers}
+\label{sec:org9be2093}
+
+There are a lot of times we want to ommit certain places where we have junk in a file. 
+By junk I dont really mean garbage in the sense that its not important but I mean
+that its not applicable for what we need.
+
+you can achieve this by using Range Specifiers which controls what field the given lines of the input will be read.
+
+A Position Specifier may be used in combitation with a Parser Directive to give more flexibilty to the user;
+detailing what subset of data of the input that will be read.
+
+given the following syntax.\\
+\begin{verbatim}
+"||0,1"
+\end{verbatim}
+\emph{which reads each column skipping the first column entirely}
+
+A practical application to get all of the numbers on line 5 would be
+\begin{verbatim}
+$ cat file.txt
+John Doe
+March 21st, 2022
+John_The_Doe@hotmail.com (because I feel hotmail is funny)
+
+10 20 30 40 50
+hello good bye
+
+$ ltpl file.txt "--5,5[p]"
+10 20 30 40 50
+\end{verbatim}
+\emph{where it reads only one singular line of text at line 5 and prints it}
+\end{enumerate}
+\subsection{Objects}
+\label{sec:org5a13a1d}
+\subsubsection{What Are Objects ?}
+\label{sec:org7b5a859}
+Objects in ltpl really are one of the most complex things in the entire language.
+but even though they are complex they are also rather simple in structure.
+Objects are hiearchical and able to be indexed quite simply as well.
+
+\Tree [.S a [.NP b c ]    d ]
+\Tree [.S a [    b c ].NP d ]
+\subsubsection{Object Primitives}
+\label{sec:orgb5fd908}
+Object Primitives are a what you would call literals in any other language but there is a quirk of all objects in ltpl.
+every object has children represented as numbers. By default you are adressing the children of \$0 when refering to lines.
+
+
+\subsubsection{Fields And Implict Objects}
+\label{sec:org1277496}
+\begin{enumerate}
+\item Fields
+\label{sec:orgdbbbbe4}
+Fields are the way that LTPL treats columns of text that are seperated by the \$FS implicit object.
+\item Implicit Objects
+\label{sec:orgd55f964}
+\begin{center}
+\begin{tabular}{llll}
+\hline
+Name & Description & Type & \\
+\hline
+\$0 & The 0th field refering to the whole line of text. That contains an object array of & Object Array & \\
+\hline
+\$n & The \$nth field that refers to an object that is broken up into fields by the \$fs & Integer Object & \\
+\hline
+\$FS & the delimiting character(s) that designantes the seperation of new tokens by a user defined or LTPL specified token & String Object & \\
+\hline
+\$CL & the current line being read &  & \\
+\hline
+\$PL & previous line read &  & \\
+\hline
+\$NL & the next line to be read. &  & \\
+\hline
+\$NLR & the number of lines that have been read. &  & \\
+\hline
+\$NTR & the number of lines that need to be read. &  & \\
+\hline
+\$RED & An object &  & \\
+\hline
+\$GREEN &  &  & \\
+\hline
+\$BLUE &  &  & \\
+\hline
+\$BLACK &  &  & \\
+\hline
+\$WHITE &  &  & \\
+\hline
+\$CYAN &  &  & \\
+\hline
+\$MAGENTA &  &  & \\
+\hline
+\$YELLOW &  &  & \\
+\hline
+\$PURPLE &  &  & \\
+\hline
+\$PINK &  &  & \\
+\hline
+\$ORANGE &  &  & \\
+\hline
+\end{tabular}
+\end{center}
+
+
+\emph{where n is the number of fields}
+\end{enumerate}
+
+\subsubsection{User Defined Objects}
+\label{sec:org8b8f355}
+Objects In LTPL are able to be created by referancing a nonexistant object by using the \$.
+typing the example nonsensecal case "\$bar" is a proper object declaration.
+\subsubsection{Assignement}
+\label{sec:org5ee19a2}
+Defining new variables along with reassigning existing ones are core parts of any programming language (except for the haskell purists out there)
+LTPL is no different but has a quirk to do so.
+\begin{enumerate}
+\item Examples
+\label{sec:orga2996b6}
+LTPL example.txt "==\$bar[10]."\\
+LTPL example.txt "==\$foo."\\
+\emph{both of which are valid instances of objects where foo is assigned to an empty string by default and bar is assigned to 10} \\
+
+\$ ls \\
+
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Desktop \\
+drwxr-xr-x 2 user user  4096 Feb  4 00:36 Documents \\
+drwxr-xr-x 3 user user  4096 Feb  6 23:16 Downloads \\
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Music \\
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Pictures \\
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Public \\
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Templates \\
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Videos \\
+
+ls -l | LTPL "==\$3[\textasciitilde{}=\$3]\$foo[p].
+
+Output:
+
+drwxr-xr-x 2 user 4096 Jan 20 19:42 Desktop \\
+drwxr-xr-x 2 user 4096 Feb  4 00:36 Documents \\
+drwxr-xr-x 3 user 4096 Feb  6 23:16 Downloads \\
+drwxr-xr-x 2 user 4096 Jan 20 19:42 Music \\
+drwxr-xr-x 2 user 4096 Jan 20 19:42 Pictures \\
+drwxr-xr-x 2 user 4096 Jan 20 19:42 Public \\
+drwxr-xr-x 2 user 4096 Jan 20 19:42 Templates \\
+drwxr-xr-x 2 user 4096 Jan 20 19:42 Videos \\
+\end{enumerate}
+
+\subsubsection{Object Arrays And Subfields}
+\label{sec:orgc48c678}
+Subfields and object arrays are more or less equvilent. with the only real difference is in what is being refered. to put it simply:
+
+if it is a field it will be refered to as a subfield.
+if it is a user defined object it is refered to as an object array.
+\emph{The encomapssing term between the two is object array}
+\begin{enumerate}
+\item Refering To  Object Arrays
+\label{sec:orgb6161ce}
+Below is a dummy file with that we will parse.\\
+
+Example.txt:\\
+hello world this is a tjest.
+
+if you notice there is a spelling error\\
+you can fix such a minute error like so\\
+
+LTPL Example.txt "--\$6\$2[\textasciitilde{}=\$6\$2]\$6\$1[>>]\$0[p]."\\
+\emph{where \$6 is the 6th field while refering to the 2nd object field. deleting the object in said field and moving the object on the left next to it over where the previous object resided}
+\end{enumerate}
+
+\subsection{Actions}
+\label{sec:orgc5d8f11}
+\subsubsection{What Is An Action}
+\label{sec:org6a05157}
+An action is the primary enact changes to Objects. they are syntactically represented within [].
+\begin{enumerate}
+\item Example
+\label{sec:org6e22429}
+\$ ls -l \\
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Desktop \\
+drwxr-xr-x 2 user user  4096 Feb  4 00:36 Documents \\
+drwxr-xr-x 3 user user  4096 Feb  6 23:16 Downloads \\
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Music \\
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Pictures \\
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Public \\
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Templates \\
+drwxr-xr-x 2 user user  4096 Jan 20 19:42 Videos \\
+
+ls -l | LTPL "==\$6[p]" \\
+
+Output: \\
+Jan \\
+Feb \\
+Feb \\
+Jan \\
+Jan \\
+Jan \\
+Jan \\
+Jan \\
+\end{enumerate}
+
+\subsubsection{Actions Predefined}
+\label{sec:orgac29086}
+\begin{enumerate}
+\item Output And More Output
+\label{sec:orgcaf2010}
+Keeping within the bound of the promise that this is not a scripting language There is no way to prompt users for input what so ever.
+In LTPL There a variety of different mechinisms that the user to write to a file of their choice.
+\begin{enumerate}
+\item Writing To Files
+\label{sec:org11669c3}
+What Would a text processing language be with out being able to save the manipulated text to files write to files.
+\end{enumerate}
+\end{enumerate}
+\subsubsection{Why Can't I Define My Own Actions}
+\label{sec:org53e6820}
+well there is a simple answer to that. LTPL is not a scripting language. If you feel you need to define your own actions to make a certain action easier. you should look at some other language.
+consider using AWK or perl. heck sed can be useful in some circumstances. 
+\subsubsection{Possible Actions}
+\label{sec:org9297faf}
+
+
+\begin{center}
+\begin{tabular}{lllllll}
+\hline
+Name & Symbolic Name & Description & Possible Arguments & Examples & program description & \\
+\hline
+print & p & Prints an object to stdout & p -red -green -blue \(\vert{}\) none & ---\$1[p 255,0,0]. &  & \\
+write & w & writes objects to a file & w -filename \(\vert{}\) -filename & ---\$0[w file.txt]. &  & \\
+\hline
+filter & \textasciitilde{} & removes if condition is true & \textasciitilde{} -logical operator -object & ---\$0[\textasciitilde{}=10][p]. &  & \\
+cast to type & -> & given an object it converts it to the type of a given object & -> -object & ---\$1[-> 10][p] &  & \\
+ternary & ? & does the next action if true the other if false & ? - logical operator object & ---\$1[? = 10]Success[p 0 255,0]fail[p 255,0,0]. &  & \\
+\hline
+italic & i &  & none & ---\$0[i][p]. &  & \\
+bold & b &  & none &  &  & \\
+underline & \_ & underlines an object & none & ---\$0[\_][p]. &  & \\
+highlight & \# & highlights an object & none & ---\$0[ &  & \\
+shift down line & VV & shfits an object down into the line below it. &  &  &  & \\
+shift up line & \^{}\^{} &  &  &  &  & \\
+Swap lines\\
+Move Right & >> & shifts an object right by one field replacing the object that inhabited that location & none & ---\$1[>>]\$2[p]. &  & \\
+Move Left & << & shifts an object left by one field replacing the object that inhabited that location & none &  &  & \\
+\hline
+\end{tabular}
+\end{center}
+
+\section{Implentation Details}
+\label{sec:org640bc28}
+\section{Examples}
+\label{sec:orgc9320c8}
+\section{Benchmarks}
+\label{sec:org31e501b}
+ure Ideas
+\section{Grammar BNF}
+\label{sec:org921118d}
+\end{document}

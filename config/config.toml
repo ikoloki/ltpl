@@ -1,0 +1,18 @@
+# Where each tag is a namespace
+
+title = "LTPL IMPLICIT OBJECTS CONFIG"
+
+[Colors]
+ports = [8000, 8001, 8002d]
+data = []
+temp_targets = { cpu = 79.5, case = 72.0 }
+
+[servers]
+
+[servers.alpha]
+ip = "10.0.0.1"
+role = "frontend"
+
+[servers.beta]
+ip = "10.0.0.2"
+role = "backend"

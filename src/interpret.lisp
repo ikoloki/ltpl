@@ -1,11 +1,10 @@
-(defpackage :LTPL
+(defpackage :ltpl
   (:use :cl)
-  (:local-nicknames (:a :alexandria-2)))
+  (:local-nicknames))
 
 ;; (defparameter +input-text* reading file in from $2)
 ;; (defparameter *output-text* '())
 
-(defparameter +input-stream+ (make-string-input-stream (subseq *source* 2)))
-(defparameter +tokens+ (tokenize source))
-(defparameter +ast+ (parse +tokens+))
-;; (interpret +ast+)
+
+(defun run ()
+  (tokenize (make-string-input-stream "--$1000[p]"))

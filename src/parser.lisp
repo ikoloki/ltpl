@@ -30,14 +30,14 @@
   (print "hello"))
 
  (defun parse-ref (tree)
-   ;;(push *ast* (make-token :literal "$" :symbol 'ref))
+   ;; insert-into-tree
    (let ((token (next))
-	(cond ((eq token 'action-begin)
-	       (parse-action))
-	      ((eq token 'object-primitive)
-	       (parse-object))
-	
-	 
+	 (cond ((eq token 'action-begin)
+		(parse-action))
+	       ((eq token 'object-primitive)
+		(parse-object))
+	       (t (push 11 *error-stack*))
+ 
 (defun parse (tokens)
   (let ((token-stack '())
 	(ast '(())))

@@ -11,7 +11,7 @@
   ;; (setf src (remove-if (lambda (c) (or (eq #\SPACE c) (eq #\NEWLINE c))) src))
   (let* ((directive (tokenize-directive (with-output-to-string (x)
 					  (loop for i from 0 to 1
-						for c = (read-char input-stream nil) do			
+						for c = (read-char input-stream nil) do
 						  (write-char c x)))))
 	 (tokens `(,directive)))
     (loop for c = (read-char input-stream nil)
@@ -38,7 +38,7 @@
 			 (cond ((eq c #\() (push c paren-stack))
 			       ((eq c #\)) (pop paren-stack)))
 	
-		 (write-char c output-stream)
+			 (write-char c output-stream)
 			 (when (eq paren-stack '())
 			   (loop-finish))))))
     (make-token :literal (subseq regex 1 (- (length regex) 1))
@@ -68,8 +68,7 @@
 	  ((equal directive "^|") (setf mode 'reader))
       	  (t (setf mode 'reader-error)))
     (make-token :literal directive :symbol mode)))
-
-
+    
 (defun tokenize-operator (c)
   (let ((mode nil))
     (cond ((eq #\\ c) (setf mode 'operator))
@@ -121,34 +120,3 @@
       (eq c #\;)
       (eq c #\~)
       (eq c #\|)))
-
-;; (defun tokenize-action ()
-;;   "takes an LTPL action out of the stream denoted by []"
-;;   (unread-char #\[ input-stream)
-;;   (let ((action (with-output-to-string (output-stream)
-;; 		 (loop with []-stack
-;; 		       for c = (read-char input-stream nil) do
-;; 			 (cond ((eq c #\[) (push c []-stack))
-;; 			       ((eq c #\]) (pop []-stack)))
-;; 			 (write-char c output-stream)
-
-;; 			 (when (eq []-stack '())
-;; 			   ;;(unread-char c input-stream)
-;; 			   (loop-finish))))))
-;;     (setf action (subseq action 1 (- (length action) 1)))
-;;     (make-token :literal action :symbol 'action)))
-
-
-;; (defun tokenize-object-ref (c)
-;;  "takes a object referance out of the stream denoted by $SOME-VALUE"
-;;   (unread-char c input-stream)
-;;   (let ((object (with-output-to-string (output-stream)
-;; 		  (loop for c = (read-char input-stream nil)
-;; 			if (or (alphanumericp c)
-;; 			       (eq #\$ c)) do
-;; 				 (write-char c output-stream)
-;; 			else do
-;; 			  (unread-char c input-stream)
-;; 			  (loop-finish)))))
-;;     (make-token :literal object ;;(string-split (subseq object 1) "$")
-;; 		:symbol 'object-ref)))

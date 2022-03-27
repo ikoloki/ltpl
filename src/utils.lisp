@@ -1,4 +1,4 @@
-(in-package :LTPL)
+(in-package :ltpl)
 
 ;; string Manipulation functions 
 (defun string-split (string delim)

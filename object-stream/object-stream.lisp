@@ -2,13 +2,14 @@
   (:use :cl)
   (:local-nicknames))
 
+(in-package :object-stream)
+
 (defclass object-stream ()
   ((objects
    :initarg :objects)
    (index
     :initform 0)))
 
-;; (defgeneric read-object (object-stream &key end-at-nil end-at-nil-p)
 (defgeneric read-object (object-stream))
 
 (defgeneric unread-object (object-stream))
@@ -18,31 +19,38 @@
 (defgeneric unwrite-object (object-stream))
 (defgeneric write-objects (object-stream objects))
 
-;; (defgeneric object-stream-p (object-stream))
-
 (defun make-object-stream (object-data)
-  (make-instance 'object-stream :objects object-data))
+  (error "CANNOT MAKE-OBJECT-STREAM. ONLY ITS SUBCLASSES OF:
+ WRITE-OBJECT-STREAM,
+ READ-OBJECT-STREAM AND
+ BIDIRECTIONAL-OBJECT-STREAM"))
 
 (defmethod write-object (object-stream object)
-  (push object (slot-value object-stream 'objects)))
+  (error "CANNOT WRITE-OBJECT TO OBJECT-STREAM. 
+ ONLY ITS SUBCLASSES OF:
+ WRITE-OBJECT-STREAM AND 
+ BIDIRECTIONAL-OBJECT-STREAM"))
 
 (defmethod unwrite-object (object-stream)
-  (pop (slot-value object-stream 'objects)))
+  (error "CANNOT UNWRITE-OBJECT TO OBJECT-STREAM. ONLY ITS SUBCLASSES OF:
+  WRITE-OBJECT-STREAM AND 
+  BIDIRECTIONAL-OBJECT-STREAM"))
 
-(defmethod write-objects (object-stream objects)
-  (loop for i in objects do
-    (write-object object-stream)))
+(defmethod write-objects (object-stream number)
+  (error "CANNOT WRITE-OBJECTS TO OBJECT-STREAM. ONLY ITS SUBCLASS OF:
+WRITE-OBJECT-STREAM AND BIDIRECTIONAL-OBJECT-STREAM"))
 
 (defmethod read-object (object-stream)
-  (let ((object (nth (slot-value object-stream 'index) (slot-value object-stream 'objects))))
-    (incf (slot-value object-stream 'index))
-    object))
+  (error "CANNOT READ-OBJECT FROM OBJECT-STREAM. ONLY ITS SUBCLASS OF:
+ READ-OBJECT AND
+ BIDRIECTIONAL-OBJECT-STREAM"))
 
 (defmethod unread-object (object-stream)
-  (if (= (slot-value object-stream 'index) 0)
-      nil
-      (nth (decf (slot-value object-stream 'index)) (slot-value object-stream 'objects))))
+  (error "CANNOT UNREAD-OBJECT FROM OBJECT-STREAM. 
+ONLY ITS SUBCLASS OF READ-OBJECT AND 
+BIDRIECTIONAL-OBJECT-STREAM"))
 
-(defmethod read-objects (object-stream number)
-  (loop for i from 0 to number do
-    (read-object object-stream 'objects)))
+(defmethod read-object (object-stream)
+  (error "CANNOT READ-OBJECTS FROM OBJECT-STREAM. ONLY ITS SUBCLASS OF:
+READ-OBJECT AND
+ BIDRIECTIONAL-OBJECT-STREAM"))

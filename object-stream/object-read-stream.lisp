@@ -3,24 +3,17 @@
 (defclass object-read-stream (object-stream)
   ())
 
-(defun make-object-read-stream (object-data)
-  (make-instance 'object-read-stream :objects object-data))
-			 
-(defmethod read-object (object-read-stream)
-  (let ((object (nth (slot-value object-read-stream 'index) (slot-value object-read-stream 'objects))))
-    (incf (slot-value object-read-stream 'index))
-    object))
+(defun make-object-read-stream (objects)
+  (make-instance 'object-read-stream :objects objects))
+   
+(defmethod write-object (object-read-stream object)
+  (error "UNABLE TO WRITE TO OBJECT-READ-STREAM 
+OBJECTS MUST BE OF TYPE OBJECT-STREAM OR WRITE-STREAM" #\RETURN))
 
-(defmethod unread-object (object-read-stream)
-  (if (= (slot-value object-read-stream 'index) 0)
-      nil
-      (nth (decf (slot-value object-read-stream 'index)) (slot-value object-read-stream 'objects))))
+(defmethod unwrite-object (object-read-stream object)
+  (error "UNABLE TO WRITE TO OBJECT-READ-STREAM
+OBJECTS MUST BE OF TYPE OBJECT-STREAM OR WRITE-STREAM" #\RETURN))
 
-(defmethod read-objects (object-read-stream number)
-  (loop for i from 0 to number do
-    (read-object object-read-stream 'objects)))
-
-;; (defmethod write-object (object-read-stream object))
-;; (defmethod unwrite-object (object-read-stream object))
-;; (defmethod write-objects (object-read-stream objects))
- 
+(defmethod write-objects (object-read-stream objects)
+  (error "UNABLE TO WRITE TO OBJECT-READ-STREAM
+OBJECTS MUST BE OF TYPE OBJECT-STREAM OR WRITE-STREAM" #\RETURN))

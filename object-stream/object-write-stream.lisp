@@ -1,19 +1,19 @@
 (in-package :object-stream)
 
-
-(defclass object-write-stream (object-stream)
+(defclass object-read-stream (object-stream)
   ())
 
-(defun make-object-write-stream (object-data)
-  (make-instance 'object-write-stream :objects object-data))
+(defun make-object-read-stream (objects)
+  (make-instance 'object-read-stream :objects objects))
+   
+(defmethod read-object (object-read-stream object)
+  (error "UNABLE TO READ TO OBJECT-READ-STREAM 
+OBJECTS MUST BE OF TYPE OBJECT-STREAM OR READ-STREAM" #\RETURN))
 
-(defmethod write-object (object-write-stream object)
-  (push object (slot-value object-write-stream 'objects)))
+(defmethod unread-object (object-read-stream object)
+  (error "UNABLE TO READ TO OBJECT-READ-STREAM
+OBJECTS MUST BE OF TYPE OBJECT-STREAM OR READ-STREAM" #\RETURN))
 
-(defmethod unwrite-object (object-write-stream)
-  (pop (slot-value object-write-stream 'objects))
-  (decf (slot-value object-write-stream 'index)) nil)
-
-(defmethod write-objects (object-write-stream objects)
-  (loop for i in (reverse objects) do
-    (write-object object-write-stream i)))
+(defmethod read-objects (object-read-stream objects)
+  (error "UNABLE TO READ TO OBJECT-READ-STREAM
+OBJECTS MUST BE OF TYPE OBJECT-STREAM OR READ-STREAM" #\RETURN))

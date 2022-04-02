@@ -46,6 +46,7 @@
     #+begin_src sh
     10 20 30 hello good bye 10.6    
     #+end_src
+    all of these are strings 
 
     /All of which are examples of Object Primitives/
 **** Indexing On Primitives
@@ -82,7 +83,8 @@ Instead of giving our desired result of 0 we get 2 due to the fact that ltpl
 sees the object 10$1 as 1 evaluates it then adds 1 which results in 2.
 
 #+begin_src sh
-    
+   30$1 is equvilent to 330$[1]
+#+end_src
 
 
 *** Object References

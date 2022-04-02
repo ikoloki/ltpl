@@ -9,13 +9,13 @@
 (defun tokenize (input-stream)
   "takes tokens from the *input-stream* and processes them util the end"
   ;; (setf src (remove-if (lambda (c) (or (eq #\SPACE c) (eq #\NEWLINE c))) src))
-  (let* ((directive (tokenize-directive (with-output-to-string (x)
+  (let* ((directive (tokenize-directive (with-output-to-string (tmp-stream)
 					  (loop for i from 0 to 1
 						for c = (read-char input-stream nil) do
-						  (write-char c x)))))
+						  (write-char c tmp-stream)))))
 	 (tokens `(,directive)))
-    (loop for c = (read-char input-stream nil)
-	  while c do
+    (loop :for c = (read-char input-stream nil)
+	  :while c do
 	    (cond ((eq c #\[) (push (tokenize-[ c) tokens))
 		    ((eq c #\]) (push (tokenize-] c) tokens))
 		    ((eq c #\:) (push (tokenize-colon c) tokens))

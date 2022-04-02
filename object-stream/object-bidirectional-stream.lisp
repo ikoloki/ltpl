@@ -1,8 +1,10 @@
-(defpackage :object-stream
-  (:use :cl)
-  (:local-nicknames))
+;; (defpackage :object-stream
+;;   (:use :cl)	
+;;   (:local-nicknames))
 
-(in-package :object-stream)
+;(in-package :object-stream)
+
+(in-package :ltpl)
 
 (defclass object-stream ()
   ((objects
@@ -16,7 +18,7 @@
 (defgeneric read-objects (object-stream number))
 
 (defgeneric write-object (object-stream object))
-(defgeneric unwrite-object (object-stream object))
+(defgeneric unwrite-object (object-stream))
 (defgeneric write-objects (object-stream objects))
 
 (defun make-object-stream (object-data)
@@ -30,7 +32,7 @@
 
 (defmethod write-objects (object-stream objects)
   (loop for i in (reverse objects) do
-    (write-object object-stream i)))
+       (write-object object-stream i)))
 
 (defmethod read-object (object-stream)
   (let ((object (pop (slot-value object-stream 'objects))))

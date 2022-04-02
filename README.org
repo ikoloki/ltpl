@@ -1,0 +1,17 @@
+#+Title: Brief Intro:
+
+
+* Intro 
+  - ltpl is a declaritive text processing domain specific language.
+  - It competes with AWK.
+* Features
+  - Built In Perl Compatible Regular Expressions
+  - Enables Easy Text Parsing
+* Pros
+  - Terse
+  - Powerful
+  - Written in lisp
+  - Embbedable
+* Cons
+  - Cryptic
+    

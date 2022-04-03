@@ -1,28 +1,22 @@
 #+Title: Brief Intro:
 
-* Introductino
+* Introductin
 ** What Is This Exactly ?
-   LTPL is a declaritive text processing and manipulation Domain Specific Langugage utility that specializes in making common
-   text processing tasks as easily and tersely as possible.
+   ltpl is a delaritive text processing dsl. A utiliy that just happends to have a language inside of it.
 ** Who Is This For ?
-   This is a tool mainly for programmers and users who require rigid formated text output. Specifically targeting
-   those who would traditionally use awk to do so.
-** Why Does This Exist ?
-   I wanted a utility for text processing that was more flexible than Sed but more tearse than awk that
-   that didnt contain the C-isms that was carried over as bagage from the Bell Labs Unix style thought process when designing awk.
-** What This Tool Is
-*** It is a Utility For Text Manipulation
-    LTPL is more a utility along the lines of sed and awk than an actual language you would write in a file.
-    It ment to be embedded in sh scripts and to be used either along side or be more versitle than more traditional tools.
-** What This Tool Is Not    
-*** It Is Not /Complete/ Replacement For Awk. 
-    I am only comparing my language periodically to awk as the closest parallel of the language that exists and is in relitive popular use today.
-    I am aware that awk is a more traditional language with a much more familar syntax that is ment to write programs and scripts that may be run from a file or piped in from another program.
-    however the purpose of LTPL is explicitly for reading in and displaying data.
-    
-*** It Is Not A General Purpose Scripting Language
-    This tool is not for all intensive purposes is not a scrihpting language nor should it ever be used as one.
-    LTPL is a tearse and simple text processing utility and nothing more.
+   This language primarily aims at people who want to do easy formated text output in the terminal.
+
+* Examples
+Fizzbuzz
+#+begin_src sh
+    $ echo "10 20 30 50 55" > file.txt
+    $ ltpl file.txt "--$CF[?=:\3:0]fizz[p][?=:\5:0]buzz[p]"      
+#+end_src
+
+#+begin_src sh
+    $ ltpl dummy.txt "--hello_world[p]"
+#+end_src
+
 ** Why The Cryptic Syntax
    LTPL's syntax and grammar is very simple aiming and being simple to use in a terminal enviroment.
    With this consideration taken a APL or Regular expression like syntax was considerd appropriate for a speedy interactive usage that I was trying to achieve.

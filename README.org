@@ -5,6 +5,7 @@
    ltpl is a delaritive text processing dsl. A utility that just happends to have a language inside of it.
 ** Who Is This For ?
    This language primarily aims at people who want to do easy formated text output or parsing of information from files in the terminal.
+   this would be a nifty tool to use in shell scripts as well for the sorts of things that awk sed or shell would make it annoying to do.
 
 * Examples
 Fizzbuzz
@@ -27,6 +28,13 @@ declaritive approach
     13
 #+end_src
 
+ Even more declaritive approcach
+#+begin_src sh
+    $ echo "this is a test here not to mention that this is great too" > file.txt
+    $ ltpl "--[p]."
+    13
+#+end_src
+
 iterative approach
 #+begin_src sh 
     $ echo "another test here" > file.txt
@@ -34,9 +42,19 @@ iterative approach
     3
 #+end_src
 
+#+begin_src sh
+    $ echo "1 2 3 4" > file.txt
+    $ ltpl file.txt "--[pwr]"
+    1 
+    2
+    3
+    4
+    #+end_src 
+
 * Installation
   Comming soon to theatres near you!
 * Why The Cryptic Syntax
    ltpl's syntax and grammar is very simple aiming and being simple to use in a terminal enviroment.
    With this consideration taken a APL or Regular expression like syntax was considerd appropriate for a speedy interactive usage that I wanted.
+   
    

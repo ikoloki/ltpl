@@ -13,20 +13,21 @@ Fizzbuzz
     $ ltpl file.txt "--$CF[?:=:\3:0]fizz[p][?:=:\5:0]buzz[p]."
 #+end_src
 
-- hello world 
+hello world 
 #+begin_src sh
     $ ltpl dummy.txt "--hello_world[p]"
     hello world
 #+end_src
 
  word count
+declaritive approach
 #+begin_src sh
     $ echo "this is a test here not to mention that this is great too" > file.txt
     $ ltpl "--$NF[p]."
     13
 #+end_src
 
-using the child operator
+iterative approach
 #+begin_src sh 
     $echo "another test here" > file.txt
     $ltpl file.txt "--i[0]$0!$i[+:$i:1]i[p]."

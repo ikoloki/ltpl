@@ -1,22 +1,37 @@
 #+Title: Brief Intro:
 
-* Introductin
+* Introduction
 ** What Is This Exactly ?
    ltpl is a delaritive text processing dsl. A utiliy that just happends to have a language inside of it.
 ** Who Is This For ?
-   This language primarily aims at people who want to do easy formated text output in the terminal.
+   This language primarily aims at people who want to do easy formated text output or parsing of information from files in the terminal.
 
 * Examples
 Fizzbuzz
 #+begin_src sh
     $ echo "10 20 30 50 55" > file.txt
-    $ ltpl file.txt "--$CF[?=:\3:0]fizz[p][?=:\5:0]buzz[p]"      
+    $ ltpl file.txt "--$CF[?:=:\3:0]fizz[p][?:=:\5:0]buzz[p]."
 #+end_src
 
+- hello world 
 #+begin_src sh
     $ ltpl dummy.txt "--hello_world[p]"
+    hello world
+#+end_src
+
+ word count
+#+begin_src sh
+    $ echo "this is a test here not to mention that this is great too" > file.txt
+    $ ltpl "--$NF[p]."
+    13
+#+end_src
+
+#+begin_src sh 
+    $echo "another test here" > file.txt
+    $ltpl file.txt "--$0![p]."
 #+end_src
 
 ** Why The Cryptic Syntax
-   LTPL's syntax and grammar is very simple aiming and being simple to use in a terminal enviroment.
-   With this consideration taken a APL or Regular expression like syntax was considerd appropriate for a speedy interactive usage that I was trying to achieve.
+   ltpl's syntax and grammar is very simple aiming and being simple to use in a terminal enviroment.
+   With this consideration taken a APL or Regular expression like syntax was considerd appropriate for a speedy interactive usage that I wanted.
+   

@@ -6,39 +6,32 @@
 ** Who Is This For ?
    This language primarily aims at people who want to do easy formated text output or parsing of information from files in the terminal.
    this would be a nifty tool to use in shell scripts as well for the sorts of things that awk sed or shell would make it annoying to do.
-
 * Examples
 Fizzbuzz
 #+begin_src sh
     $ echo "10 20 30 50 55" > file.txt
-    $ ltpl file.txt "--$CF[?:=:\3:0]fizz[p][?:=:\5:0]buzz[p]."
+    $ ltpl file.txt "--@$CF[?:=:\3:0]fizz[p][?:=:\5:0]buzz[p]."
 #+end_src
 
 hello world 
 #+begin_src sh
-    $ ltpl dummy.txt "--hello_world[p]"
+    $ ltpl dummy.txt "--@hello_world[p]"
     hello world
 #+end_src
 
- word count
+word count
+
 declaritive approach
 #+begin_src sh
     $ echo "this is a test here not to mention that this is great too" > file.txt
-    $ ltpl "--$NF[p]."
-    13
-#+end_src
-
- Even more declaritive approcach
-#+begin_src sh
-    $ echo "this is a test here not to mention that this is great too" > file.txt
-    $ ltpl "--[p]."
+    $ ltpl "--@$NF[p]."
     13
 #+end_src
 
 iterative approach
 #+begin_src sh 
     $ echo "another test here" > file.txt
-    $ ltpl file.txt "--i[0]$0!$i[+:$i:1]i[p]."
+    $ ltpl file.txt "--@i[0]$0!$i[+:$i:1]$i[p]."
     3
 #+end_src
 

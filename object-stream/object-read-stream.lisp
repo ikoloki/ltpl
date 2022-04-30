@@ -1,5 +1,4 @@
-;; (in-package :object-stream)
-(in-package :ltpl)
+(in-package :object-stream)
 
 (defclass object-read-stream (object-stream)
   ())
@@ -11,10 +10,14 @@
   (error "UNABLE TO WRITE TO OBJECT-READ-STREAM 
  OBJECTS MUST BE OF TYPE OBJECT-STREAM OR WRITE-STREAM" #\RETURN))
 
+(defmethod write-objects (object-read-stream objects)
+  (error "UNABLE TO WRITE TO OBJECT-READ-STREAM
+OBJECTS MUST BE OF TYPE OBJECT-STREAM OR WRITE-STREAM" #\RETURN))
+
 (defmethod unwrite-object (object-read-stream)
   (error "UNABLE TO WRITE TO OBJECT-READ-STREAM
 OBJECTS MUST BE OF TYPE OBJECT-STREAM OR WRITE-STREAM" #\RETURN))
 
-(defmethod write-objects (object-read-stream objects)
-  (error "UNABLE TO WRITE TO OBJECT-READ-STREAM
+(defmethod unwrite-objects (object-read-stream)
+    (error "UNABLE TO WRITE TO OBJECT-READ-STREAM
 OBJECTS MUST BE OF TYPE OBJECT-STREAM OR WRITE-STREAM" #\RETURN))

@@ -1,34 +1,34 @@
 #+Title: LTPL : Loki Text Processing Language Manual
 #+Date: 2/7/22
 #+STARTUP: latexpreview
-* Introduction
+* Introduction 
 ** What Is This Exactly ?
-   LTPL is a declaritive text processing and manipulation Domain Specific Langugage utility that specializes in making common
+   LTPL is a declarative text processing and manipulation Domain Specific Language utility that specializes in making common
    text processing tasks as easily and tersely as possible.
 ** Who Is This For ?
-   This is a tool mainly for programmers and users who require rigid formated text output. Specifically targeting
-   those who would traditionally use awk to do so.
+   This is a tool mainly for programmers and users who require rigid formatted text output. Specifically targeting
+   those who would traditionally use sed to do so.
 ** Why Does This Exist ?
-   I wanted a utility for text processing that was more flexible than Sed but more tearse than awk that
-   that didnt contain the C-isms that was carried over as bagage from the Bell Labs Unix style thought process when designing awk.
+   I wanted a utility for text processing that was more flexible than Sed but more terse than awk that
+   that didn't contain the C-isms that was carried over as baggage from the Bell Labs Unix style thought process when designing awk.
 ** What This Tool Is
 *** It is a Utility For Text Manipulation
     LTPL is more a utility along the lines of sed and awk than an actual language you would write in a file.
-    It ment to be embedded in sh scripts and to be used either along side or be more versitle than more traditional tools.
+    It meant to be embedded in sh scripts and to be used either along side or be more versatile than more traditional tools.
 ** What This Tool Is Not    
 *** It Is Not /Complete/ Replacement For Awk. 
-    I am only comparing my language periodically to awk as the closest parallel of the language that exists and is in relitive popular use today.
-    I am aware that awk is a more traditional language with a much more familar syntax that is ment to write programs and scripts that may be run from a file or piped in from another program.
+    I am only comparing my language periodically to awk as the closest parallel of the language that exists and is in relative popular use today.
+    I am aware that awk is a more traditional language with a much more familiar syntax that is meant to write programs and scripts that may be run from a file or piped in from another program.
     however the purpose of LTPL is explicitly for reading in and displaying data.
     
 *** It Is Not A General Purpose Scripting Language
-    This tool is not for all intensive purposes is not a scrihpting language nor should it ever be used as one.
-    LTPL is a tearse and simple text processing utility and nothing more.
+    This tool is not for all intensive purposes is not a scripting language nor should it ever be used as one.
+    LTPL is a terse and simple text processing utility and nothing more.
 ** Why The Cryptic Syntax
-   LTPL's syntax and grammar is very simple aiming and being simple to use in a terminal enviroment.
-   With this consideration taken a APL or Regular expression like syntax was considerd appropriate for a speedy interactive usage that I was trying to achieve.
-* Essentals
-  There are four core concepts exibit themselves in LTPL.
+   LTPL's syntax and grammar is very simple aiming and being simple to use in a terminal environment.
+   With this consideration taken a APL or Regular expression like syntax was considered appropriate for a speedy interactive usage that I was trying to achieve.
+* Essentials
+  There are four core concepts exhibit themselves in LTPL.
   The language its self is rather simple which makes it a very powerful tool for parsing text.
 
   - Objects
@@ -40,18 +40,125 @@
 *** What Are Objects ?
     Objects in ltpl really are one of the most complex things in the entire language.
     but even though they are complex they are also rather simple in structure.
-    Objects are heiarchical and able to be indexed quite simply as well.
+    Objects are hierarchical and able to be indexed quite simply as well.
     
+    Objects are the way that ltpl interacts with data.
+    the usage of which is 
 *** Object Primitives    
-    #+begin_src sh
-    10 20 30 hello good bye 10.6    
-    #+end_src
-    all of these are strings 
 
-    /All of which are examples of Object Primitives/
-**** Indexing On Primitives
-     in ltpl by default all objects are strings. and Like all strings you would be able to index into them. 
-     given the object of: 
+    
+**** Strings 
+     To put it shortly strings are the core part of the ltpl type system.
+     everything in some manner eventually breaks down into some conglomeration of strings.
+     
+     The representation of strings can be shown as this:
+    #+begin_src shell
+      10 20 30 hello good_bye 10.6
+    #+end_src
+
+    Say I wanted to represent the string of "hello world"
+    that would be represented as so
+    #+begin_src shell
+      hello__world
+    #+end_src
+
+    where the "__" is the representation of white space
+        
+**** Escape Sequences
+if you are more familiar with the C family of languages, C++,C Rust,Java etc.
+you are quite aware of the utility and purpose of escape sequences.
+
+#+begin_src C
+  int main() {
+    const char *str1 = "hello world\n";
+    const char *str2 = "good__bye ";
+    const char *str3 = "greetings\t";
+    const char *str4 = "bye\r\t\n";
+    const char *str4 = "beepings\a";
+    
+    return 0;
+  }
+#+end_src
+
+most if not all of the examples has been needed at one time or another.
+the three most common of which are "\n" "\r" "\t" which stand for
+newline carriage return and tab respectively can be represented with using the single
+quote like so:
+
+#+begin_src lisp
+  'LINEFEED
+  'CARRIAGE_RET
+  'TAB 
+  '__  #for whitespace
+  'BEEP 
+#+end_src
+This is all fine and dandy but in C those aren't are not the only things you would need to escape
+#+begin_src C
+  int main() {
+    const char *str1 = "\"hello\""
+    const char *str2 - "\'hello\'"
+    return 0;
+  }
+#+end_src
+
+In C and most other languages the " " are delimiters for representing strings
+luckily in ltpl this doesn't exist.
+" and ' are like any other character, However that does not mean there aren't things 
+that need to be escaped. for reasons that will be covered in subsequent sections.
+the following are required to be quoted when needing to be manipulated or assigned to an object.
+
+- any object that is the name of an action MUST be prefaced by the escape delimiters
+- ANSI terminal colors are not escapable (three's a good reason for that will be discussed later)
+
+**** Numbers and Operators
+   in ltpl all objects are represented as a tree structure of strings. 
+   however that being said everyone programmer needs a way to express numerical computations.
+      
+   There are two things that determine the type of an object
+   - The operator its accocated with
+   - The action that it is being applied to
+
+   for example:
+   10 in its self is not the numerical representation of ten.
+   no more than the letter b is a numerical representation of 1.
+   
+   10 can be accocated to its numerical representation by being used in an action that expects a numeric type as so.
+   if i = 10
+   #+begin_src shell
+     $i+10 -> 20
+     10~$i -> 1010
+   #+end_src
+   notice how the first operator "+" (addition) uses the string stored in i as a numerical type.
+   on the next line the "~" (concatenation) operator since 10 is being used by the concatenation operator and the concatenation operator expects strings 
+   10 is acted upon as as string.
+   
+    there are quite a few operators in ltpl
+    - addition +
+    - subtraction -
+    - multiplying *
+    - modulus \
+    - division /  
+    - power ^
+    - concatenation ~
+    - split |
+    - expansion !
+     
+#+begin_src shell
+    10+10 -> 20
+    10-10 -> 0
+    10*10 -> 100
+    10/10 -> 1
+    10^10 -> 10000000000 
+    
+    10~10 -> 1010
+    100|0 -> 1
+    100! -> 1 0 0 # special operator
+#+end_src
+
+**** Indexing On Objects
+As said before all objects in ltpl are strings.
+Like all strings you would be able to index into them. 
+given the object of: 
 #+begin_src sh
     10
 #+end_src
@@ -64,137 +171,97 @@ Lets say we want to get the second inner object of the of the object.
     10$[.5*2]-> 0
     10$[0.5*2] -> 0
 #+end_src
-/each of these are equivlent due to arthicmatic evaluation/
+/each of these are equivalent due to arithmetic evaluation/
 the power of programmatic indexing is evident but at times we just want it to be simple. 
 in practice you could 100% do this:
 #+begin_src sh 
     10$[1] -> 1
 #+end_src
 because the first object that makes up the object primitive 10 is 1
-However you could also write this which is entirely syntactically equivlent to the notation above:
+However you could also write this which is entirely syntactically equivalent to the notation above:
 #+begin_src sh
     10$1
 #+end_src
-Unfortenatly programatic indexing with this syntax is not possible. But it doesnt mean that this syntax isnt sound
+Unfortenatly programatic indexing with this syntax is not possible. But it doesnt mean that this syntax isn't sound
 #+begin_src sh 
     10$1+1 -> 2
 #+end_src 
 Instead of giving our desired result of 0 we get 2 due to the fact that ltpl
 sees the object 10$1 as 1 evaluates it then adds 1 which results in 2.
 
-#+begin_src sh
-   30$1 is equvilent to 330$[1]
+#+begin_src shell
+  330$1 is equivalent to 330$[1]
+  however 330$1+2 and 330$[1+2] are not.
 #+end_src
 
 
 *** Object References
-*** Fields And Implict Objects
+*** Fields And Implicit Objects
 **** Fields 
-     Fields are the way that LTPL treats columns of text that are seperated by the $FS implicit object.
-**** Implicit Objects
-      |----------+---------------------------------------------------------------------------------------------------------------------+----------------+---|
-      | Name     | Description                                                                                                         | Type           |   |
-      |----------+---------------------------------------------------------------------------------------------------------------------+----------------+---|
-      | $0       | The 0th field refering to the whole line of text. That contains an object array of                                  | Object Array   |   |
-      |----------+---------------------------------------------------------------------------------------------------------------------+----------------+---|
-      | $n       | The $nth field that refers to an object that is broken up into fields by the $fs                                    | Integer Object |   |
-      |----------+---------------------------------------------------------------------------------------------------------------------+----------------+---|
-      | $FS      | the delimiting character(s) that designantes the seperation of new tokens by a user defined or LTPL specified token | String Object  |   |
-      |----------+---------------------------------------------------------------------------------------------------------------------+----------------+---|
-      | $CL      | the current line being read                                                                                         |                |   |
-      |----------+---------------------------------------------------------------------------------------------------------------------+----------------+---|
-      | $PL      | previous line read                                                                                                  |                |   |
-      |----------+---------------------------------------------------------------------------------------------------------------------+----------------+---|
-      | $NL      | the next line to be read.                                                                                           |                |   |
-      |----------+---------------------------------------------------------------------------------------------------------------------+----------------+---|
-      | $NLR     | the number of lines that have been read.                                                                            |                |   |
-      |----------+---------------------------------------------------------------------------------------------------------------------+----------------+---|
-      | $NTR     | the number of lines that need to be read.                                                                           |                |   |
-      |----------+---------------------------------------------------------------------------------------------------------------------+----------------+---|
-      | $RED     | The Color Red                                                                                                       |                |   |
-      |----------+---------------------------------------------------------------------------------------------------------------------+----------------+---|
-      | $GREEN   |                                                                                                                     |                |   |
-      |----------+---------------------------------------------------------------------------------------------------------------------+----------------+---|
-      | $BLUE    |                                                                                                                     |                |   |
-      |----------+---------------------------------------------------------------------------------------------------------------------+----------------+---|
-      | $BLACK   |                                                                                                                     |                |   |
-      |----------+---------------------------------------------------------------------------------------------------------------------+----------------+---|
-      | $WHITE   |                                                                                                                     |                |   |
-      |----------+---------------------------------------------------------------------------------------------------------------------+----------------+---|
-      | $CYAN    |                                                                                                                     |                |   |
-      |----------+---------------------------------------------------------------------------------------------------------------------+----------------+---|
-      | $MAGENTA |                                                                                                                     |                |   |
-      |----------+---------------------------------------------------------------------------------------------------------------------+----------------+---|
-      | $YELLOW  |                                                                                                                     |                |   |
-      |----------+---------------------------------------------------------------------------------------------------------------------+----------------+---|
-      | $PURPLE  |                                                                                                                     |                |   |
-      |----------+---------------------------------------------------------------------------------------------------------------------+----------------+---|
-      | $PINK    |                                                                                                                     |                |   |
-      |----------+---------------------------------------------------------------------------------------------------------------------+----------------+---|
-      | $ORANGE  |                                                                                                                     |                |   |
-      |----------+---------------------------------------------------------------------------------------------------------------------+----------------+---|
-
-      
-      /where n is the number of fields/
+     Fields are the way that LTPL treats columns of text that are separated by the $FS implicit object.
 
 *** User Defined Objects
-    Objects In LTPL are able to be created by referancing a nonexistant object by using the $.
-    typing the example nonsensecal case "$bar" is a proper object declaration.
-*** Assignement
-    Defining new variables along with reassigning existing ones are core parts of any programming language (except for the haskell purists out there)
+    Objects In LTPL are able to be created by referencing a nonexistent object by using the $.
+    typing the example nonsensical case "$bar" is a proper object declaration.
+*** Assignment
+    Defining new variables along with reassigning existing ones are core parts of any programming language (except for the Haskell purists out there)
     LTPL is no different but has a quirk to do so.
 **** Examples     
-     LTPL example.txt "==$bar[10]."\\
-     LTPL example.txt "==$foo."\\
+#+begin_src shell
+     ltpl example.txt "==$bar[10]."
+     ltpl example.txt "==$foo."
+#+end_src
      /both of which are valid instances of objects where foo is assigned to an empty string by default and bar is assigned to 10/ \\
      
-     $ ls \\
+#+begin_src
 
-     drwxr-xr-x 2 user user  4096 Jan 20 19:42 Desktop \\
-     drwxr-xr-x 2 user user  4096 Feb  4 00:36 Documents \\
-     drwxr-xr-x 3 user user  4096 Feb  6 23:16 Downloads \\
-     drwxr-xr-x 2 user user  4096 Jan 20 19:42 Music \\ 
-     drwxr-xr-x 2 user user  4096 Jan 20 19:42 Pictures \\
-     drwxr-xr-x 2 user user  4096 Jan 20 19:42 Public \\ 
-     drwxr-xr-x 2 user user  4096 Jan 20 19:42 Templates \\
-     drwxr-xr-x 2 user user  4096 Jan 20 19:42 Videos \\
+     $ ls 
+
+     drwxr-xr-x 2 user user  4096 Jan 20 19:42 Desktop
+     drwxr-xr-x 2 user user  4096 Feb  4 00:36 Documents
+     drwxr-xr-x 3 user user  4096 Feb  6 23:16 Downloads
+     drwxr-xr-x 2 user user  4096 Jan 20 19:42 Music 
+     drwxr-xr-x 2 user user  4096 Jan 20 19:42 Pictures
+     drwxr-xr-x 2 user user  4096 Jan 20 19:42 Public 
+     drwxr-xr-x 2 user user  4096 Jan 20 19:42 Templates
+     drwxr-xr-x 2 user user  4096 Jan 20 19:42 Videos
 
      ls -l | LTPL "==$3[~=$3]$foo[p].
 
-     Output:
-
-     drwxr-xr-x 2 user 4096 Jan 20 19:42 Desktop \\
-     drwxr-xr-x 2 user 4096 Feb  4 00:36 Documents \\
-     drwxr-xr-x 3 user 4096 Feb  6 23:16 Downloads \\
-     drwxr-xr-x 2 user 4096 Jan 20 19:42 Music \\ 
-     drwxr-xr-x 2 user 4096 Jan 20 19:42 Pictures \\
-     drwxr-xr-x 2 user 4096 Jan 20 19:42 Public \\ 
-     drwxr-xr-x 2 user 4096 Jan 20 19:42 Templates \\
-     drwxr-xr-x 2 user 4096 Jan 20 19:42 Videos \\
-     
+     drwxr-xr-x 2 user 4096 Jan 20 19:42 Desktop 
+     drwxr-xr-x 2 user 4096 Feb  4 00:36 Documents
+     drwxr-xr-x 3 user 4096 Feb  6 23:16 Downloads
+     drwxr-xr-x 2 user 4096 Jan 20 19:42 Music
+     drwxr-xr-x 2 user 4096 Jan 20 19:42 Pictures
+     drwxr-xr-x 2 user 4096 Jan 20 19:42 Public
+     drwxr-xr-x 2 user 4096 Jan 20 19:42 Templates
+     drwxr-xr-x 2 user 4096 Jan 20 19:42 Videos
+     #+end_sr
 *** Object Arrays And Subfields
-    Subfields and object arrays are more or less equvilent. with the only real difference is in what is being refered. to put it simply:
+    Sub fields and object arrays are more or less equivalent. with the only real difference is in what is being refereed. to put it simply:
 
-    if it is a field it will be refered to as a subfield.
-    if it is a user defined object it is refered to as an object array.
-    /The encomapssing term between the two is object array/
-**** Refering To  Object Arrays
-     Below is a dummy file with that we will parse.\\
-     \\
-     Example.txt:\\
+    if it is a field it will be refereed to as a sub field.
+    if it is a user defined object it is refereed to as an object array.
+    /The encompassing term between the two is object array/
+**** Referring To  Object Arrays
+     Below is a dummy file with that we will parse.
+
+     #+begin_src
+     $ cat example.txt
      hello world this is a tjest.
 
      if you notice there is a spelling error\\
      you can fix such a minute error like so\\
     
      LTPL Example.txt "--$6$2[~=$6$2]$6$1[>>]$0[p]."\\
-     /where $6 is the 6th field while refering to the 2nd object field. deleting the object in said field and moving the object on the left next to it over where the previous object resided/
+     #+end_src
+/where $6 is the 6th field while refering to the 2nd object field. deleting the object in said field and moving the object on the left next to it over where the previous object resided/
         
 ** Reader Directives
 *** What Is A Reader Directive
     A Reader Directive is a command to the intepreter that directs the manner in which the input file will be parsed.
 
-    There are two main Reader Directive types in LTPL.
+    There are two main Reader Directive types in ltpl.
     - Parsing Directives
     - Range Specifiers
 
@@ -343,34 +410,71 @@ A practical application to get all of the numbers on line 5 would be
 *** Why Can't I Define My Own Actions
     well there is a simple answer to that. LTPL is not a scripting language. If you feel you need to define your own actions to make a certain action easier. you should look at some other language.
     consider using AWK or perl. heck sed can be useful in some circumstances. 
-*** Possible Actions
 
-    
-    |-----------------+---------------+---------------------------------------------------------------------------------------+--------------------------------+-------------------------------------------------+---------------------+---|
-    | Name            | Symbolic Name | Description                                                                           | Possible Arguments             | Examples                                        | program description |   |
-    |-----------------+---------------+---------------------------------------------------------------------------------------+--------------------------------+-------------------------------------------------+---------------------+---|
-    | print           | p             | Prints an object to stdout                                                            | p -red -green -blue \vert none | ---$1[p 255,0,0].                               |                     |   |
-    | write           | w             | writes objects to a file                                                              | w -filename \vert -filename    | ---$0[w file.txt].                              |                     |   |
-    |-----------------+---------------+---------------------------------------------------------------------------------------+--------------------------------+-------------------------------------------------+---------------------+---|
-    | filter          | ~             | removes if condition is true                                                          | ~ -logical operator -object    | ---$0[~=10][p].                                 |                     |   |
-    | cast to type    | ->            | given an object it converts it to the type of a given object                          | -> -object                     | ---$1[-> 10][p]                                 |                     |   |
-    | ternary         | ?             | does the next action if true the other if false                                       | ? - logical operator object    | ---$1[? = 10]Success[p 0 255,0]fail[p 255,0,0]. |                     |   |
-    |-----------------+---------------+---------------------------------------------------------------------------------------+--------------------------------+-------------------------------------------------+---------------------+---|
-    | italic          | i             |                                                                                       | none                           | ---$0[i][p].                                    |                     |   |
-    | bold            | b             |                                                                                       | none                           |                                                 |                     |   |
-    | underline       | _             | underlines an object                                                                  | none                           | ---$0[_][p].                                    |                     |   |
-    | highlight       | #             | highlights an object                                                                  | none                           | ---$0[                                          |                     |   |
-    | shift down line | VV            | shfits an object down into the line below it.                                         |                                |                                                 |                     |   |
-    | shift up line   | ^^            |                                                                                       |                                |                                                 |                     |   |
-    | Swap lines
-    | Move Right      | >>            | shifts an object right by one field replacing the object that inhabited that location | none                           | ---$1[>>]$2[p].                                 |                     |   |
-    | Move Left       | <<            | shifts an object left by one field replacing the object that inhabited that location  | none                           |                                                 |                     |   |
-    |-----------------+---------------+---------------------------------------------------------------------------------------+--------------------------------+-------------------------------------------------+---------------------+---|
-    
-* Implentation Details
-* Examples
-* Benchmarks
-ure Ideas
-* Grammar BNF
+ |----------+---------------------------------------------------------------------------------------------------------------------|
+ | Name     | Description                                                                                                         |
+ |----------+---------------------------------------------------------------------------------------------------------------------|
+ | $0       | The 0th field refering to the whole line of text. That contains an object array of the                              |
+ |----------+---------------------------------------------------------------------------------------------------------------------|
+ | $n       | The $nth field that refers to an object that is broken up into fields by the $FS                                    |
+ |----------+---------------------------------------------------------------------------------------------------------------------|
+ | $FS      | the delimiting character(s) that designantes the seperation of new tokens by a user defined or ltpl specified token |
+ |----------+---------------------------------------------------------------------------------------------------------------------|
+ | $CL      | the current line being read                                                                                         |
+ |----------+---------------------------------------------------------------------------------------------------------------------|
+ | $PL      | previous line read                                                                                                  |
+ |----------+---------------------------------------------------------------------------------------------------------------------|
+ | $NL      | the next line to be read.                                                                                           |
+ |----------+---------------------------------------------------------------------------------------------------------------------|
+ | $NLR     | the number of lines that have been read.                                                                            |
+ |----------+---------------------------------------------------------------------------------------------------------------------|
+ | $NTR     | the number of lines that need to be read.                                                                           |
+ |----------+---------------------------------------------------------------------------------------------------------------------|
+ | $RED     | The Color Red 255 0 0                                                                                               |
+ |----------+---------------------------------------------------------------------------------------------------------------------|
+ | $GREEN   | The Color Green 0 255 0                                                                                             |
+ |----------+---------------------------------------------------------------------------------------------------------------------|
+ | $BLUE    | The Color Blue                                                                                                      |
+ |----------+---------------------------------------------------------------------------------------------------------------------|
+ | $BLACK   |                                                                                                                     |
+ |----------+---------------------------------------------------------------------------------------------------------------------|
+ | $WHITE   |                                                                                                                     |
+ |----------+---------------------------------------------------------------------------------------------------------------------|
+ | $CYAN    |                                                                                                                     |
+ |----------+---------------------------------------------------------------------------------------------------------------------|
+ | $MAGENTA |                                                                                                                     |
+ |----------+---------------------------------------------------------------------------------------------------------------------|
+ | $YELLOW  |                                                                                                                     |
+ |----------+---------------------------------------------------------------------------------------------------------------------|
+ | $PURPLE  |                                                                                                                     |
+ |----------+---------------------------------------------------------------------------------------------------------------------|
+ | $PINK    |                                                                                                                     |
+ |----------+---------------------------------------------------------------------------------------------------------------------|
+ | $ORANGE  |                                                                                                                     |
+ |----------+---------------------------------------------------------------------------------------------------------------------|
 
 
+      
+|-----------------+---------------+---------------------------------------------------------------------------------------+--------------------------------+-------------------------------------------------|
+| Name            | Symbolic Name | Description                                                                           | Possible Arguments             | Examples                                        |
+|                 |               |                                                                                       |                                |                                                 |
+|-----------------+---------------+---------------------------------------------------------------------------------------+--------------------------------+-------------------------------------------------|
+| print           | p             | Prints an object to stdout                                                            | p -red -green -blue \vert none | ---$1[p 255,0,0].                               |
+| write           | w             | writes objects to a file                                                              | w -filename \vert -filename    | ---$0[w file.txt].                              |
+|-----------------+---------------+---------------------------------------------------------------------------------------+--------------------------------+-------------------------------------------------|
+| filter          | ~             | removes if condition is true                                                          | ~ -logical operator -object    | ---$0[~=10][p].                                 |
+|-----------------+---------------+---------------------------------------------------------------------------------------+--------------------------------+-------------------------------------------------|
+| ternary         | ?             | does the next action if true the action after if false                                | ? - logical operator object    | ---$1[?:=:10]Success[p:0:255:0]fail[p:255:0:0]. |
+|-----------------+---------------+---------------------------------------------------------------------------------------+--------------------------------+-------------------------------------------------|
+| italic          | I             | underlines the object when printed                                                    | none                           | ---$0[i][p].                                    |
+| bold            | B             | underlines an object when printed                                                     | none                           |                                                 |
+| underline       | _             | underlines an object when printed                                                     | none                           | ---$0[_][p].                                    |
+| highlight       | #             | highlights an object                                                                  | none                           | ---$0[#:$RED][p]                                |
+| color text      | cl            | colors an object when printed                                                         |                                |                                                 |
+| shift down line | VV            | shfits an object down into the line below it.                                         |                                |                                                 |
+| shift up line   | ^^            |                                                                                       |                                |                                                 |
+| Swap lines      |               |                                                                                       |                                |                                                 |
+| Move Right      | >>            | shifts an object right by one field replacing the object that inhabited that location | none                           | ---$1[>>]$2[p].                                 |
+| Move Left       | <<            | shifts an object left by one field replacing the object that inhabited that location  | none                           |                                                 |
+|-----------------+---------------+---------------------------------------------------------------------------------------+--------------------------------+-------------------------------------------------|
+  

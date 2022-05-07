@@ -1,16 +1,10 @@
 (in-package :ltpl)
 
- (defstruct token
+(defstruct token
   (literal)
   (symbol))
- 
-(defun token-eq (x y)
-  (and (generic-cl:= (token-literal x)
-                     (token-literal y))
-       (generic-cl:= (token-symbol x)
-                     (token-symbol y))))
 
-;; (defparameter *test* "==100,1(.*(A-Z))$0$10$0[w:file.txt]$foo[p]$foo$[100+1]bar.")
+(defparameter *test* "==100,1(.*(A-Z))$0$10![w:file.txt]$foo[p]$foo$[100+1]bar.")
 
 (defun tokenize (input-stream)
   "takes tokens from the *input-stream* and processes them util the end"
@@ -27,8 +21,9 @@
                   ((eq c #\:) (push (tokenize-colon c) tokens))
                   ((eq c #\') (push (tokenize-escape c) tokens))
                   ((eq c #\() (push (tokenize-regex input-stream) tokens))
+                  ((eq c #\@) (push (tokenize-reader-end c) tokens))
                   ((eq c #\,) (push (tokenize-comma c) tokens))
-                  ((eq c #\$) (push (tokenize-ref$ c) tokens))
+                  ((eq c #\$) (push (tokenize-object input-stream c) tokens))
                   ((eq c #\.) (push (tokenize-terminator c) tokens))
                   ((operatorp c) (push (tokenize-operator c) tokens))
                   ((alphanumericp c) (push (tokenize-object input-stream c) tokens))
@@ -47,44 +42,40 @@
 			 (when (eq paren-stack '())
 			   (loop-finish))))))
     (make-token :literal (subseq regex 1 (- (length regex) 1))
-		;;regex
                 :symbol 'regex)))
+
 
 (defun tokenize-object (input-stream c)
   "takes a object referance out of the stream denoted by foo or 10 10.0 foo.0"
   (unread-char c input-stream) ;; unread c to prevent the first char from being cut off
   (let* ((object (with-output-to-string (output-stream)
-			     (loop for c = (read-char input-stream nil)
-				   if (null c) do
-				     (loop-finish)
-				   if (alphanumericp c) do
-				     (write-char c output-stream)
-				   else do
-				     (unread-char c input-stream)
-				     (loop-finish)))))
-  (make-token :literal object :symbol 'object-primitive)))
+                   (loop :for c := (read-char input-stream nil)
+                         :for i from 0
+                         :if (null c) :do
+                           (loop-finish)
+                         :else :if (alphanumericp c) :do
+                           (write-char c output-stream)
+                         :else :if (and (eq #\$ c) (= i 0)) :do
+                           (write-char c output-stream)
+                         :else :do
+                           (unread-char c input-stream)
+                           (loop-finish)))))
+    (if (eq (char object 0) #\$)
+        (make-token :literal object :symbol 'object-ref)
+        (make-token :literal object :symbol 'object-primitive))))
 
 (defun tokenize-directive (directive)
-  (let ((mode nil))    
+  (let ((mode nil))
     (cond ((equal directive "==") (setf mode 'reader))
 	  ((equal directive "||") (setf mode 'reader))
 	  ((equal directive "--") (setf mode 'reader))
 	  ((equal directive "<=") (setf mode 'reader))
-	  ((equal directive "^|") (setf mode 'reader))
-      	  (t (setf mode 'reader-error)))
+	  ((equal directive "^^") (setf mode 'reader))
+    (t (setf mode 'reader-error)))
     (make-token :literal directive :symbol mode)))
-    
-(defun tokenize-operator (c)
-  (let ((mode nil))
-    (cond ((eq #\\ c) (setf mode 'operator))
-      	  ((eq #\/ c) (setf mode 'operator))
-	        ((eq #\* c) (setf mode 'operator))
-	        ((eq #\- c) (setf mode 'operator))
-	        ((eq #\+ c) (setf mode 'operator)))
-    (make-token :literal c :symbol mode)))
 
-(defun tokenize-ref$ (c)
-  (make-token :literal c :symbol 'ref))
+(defun tokenize-operator (c)
+  (make-token :literal c :symbol 'operator))
 
 (defun tokenize-terminator (c)
   (make-token :literal c :symbol 'terminator))
@@ -104,24 +95,12 @@
 (defun tokenize-] (c)
   (make-token :literal c :symbol 'action-end))
 
+(defun token-reader-end (c)
+  (make-token :literal c :symbol 'reader))
+
 (defun operatorp (c)
-  (let ((operators '(#\\ #\+ #\- #\* #\/)))
+  (let ((operators '(#\\ #\+ #\- #\* #\/ #\| #\!)))
     (dolist (op operators)
       (when (eq op c)
 	(return-from operatorp t)))))
 
-(defun objectp (c)
-  (or (alphanumericp c)
-      (eq c #\~)
-      (eq c #\@)
-      (eq c #\#)
-      (eq c #\%)
-      (eq c #\^)
-      (eq c #\&)
-      (eq c #\?)
-      (eq c #\>)
-      (eq c #\<)
-      (eq c #\")
-      (eq c #\;)
-      (eq c #\~)
-      (eq c #\|)))

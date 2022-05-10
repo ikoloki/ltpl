@@ -41,12 +41,9 @@
     Objects in ltpl really are one of the most complex things in the entire language.
     but even though they are complex they are also rather simple in structure.
     Objects are hierarchical and able to be indexed quite simply as well.
-    
-    Objects are the way that ltpl interacts with data.
-    the usage of which is 
-*** Object Primitives    
 
-    
+    objects are the way that ltpl represents data. 
+*** Object Primitives       
 **** Strings 
      To put it shortly strings are the core part of the ltpl type system.
      everything in some manner eventually breaks down into some conglomeration of strings.
@@ -63,7 +60,7 @@
     #+end_src
 
     where the "__" is the representation of white space
-        
+   
 **** Escape Sequences
 if you are more familiar with the C family of languages, C++,C Rust,Java etc.
 you are quite aware of the utility and purpose of escape sequences.
@@ -74,7 +71,7 @@ you are quite aware of the utility and purpose of escape sequences.
     const char *str2 = "good__bye ";
     const char *str3 = "greetings\t";
     const char *str4 = "bye\r\t\n";
-    const char *str4 = "beepings\a";
+    const char *str4 = "this is a bell \a";
     
     return 0;
   }
@@ -86,13 +83,13 @@ newline carriage return and tab respectively can be represented with using the s
 quote like so:
 
 #+begin_src lisp
-  'LINEFEED
-  'CARRIAGE_RET
-  'TAB 
-  '__  #for whitespace
-  'BEEP 
+   \LINEFEED
+   \CARRIAGE_RET
+   \TAB 
+   \__  #for whitespace
+   \BEEP 
 #+end_src
-This is all fine and dandy but in C those aren't are not the only things you would need to escape
+This is all fine and dandy but in C and other languages those aren't are not the only things you would need to escape
 #+begin_src C
   int main() {
     const char *str1 = "\"hello\""
@@ -114,55 +111,61 @@ the following are required to be quoted when needing to be manipulated or assign
    in ltpl all objects are represented as a tree structure of strings. 
    however that being said everyone programmer needs a way to express numerical computations.
       
-   There are two things that determine the type of an object
-   - The operator its accocated with
-   - The action that it is being applied to
+   There are two things that may determine the type of an object
+   - The operators that are enacted on the object and
+   - The action that the object is being applied to.
 
    for example:
    10 in its self is not the numerical representation of ten.
    no more than the letter b is a numerical representation of 1.
+   "10" is the string that contains the substrings of 1 and 0.
+      
+   10 can be associated to its numerical representation by being used in an action that expects a numeric type as so.
    
-   10 can be accocated to its numerical representation by being used in an action that expects a numeric type as so.
-   if i = 10
+   for the sake of example let i = 10
    #+begin_src shell
-     $i+10 -> 20
-     10~$i -> 1010
+     $i+10 ==> 20
+     10~$i ==> 1010
    #+end_src
-   notice how the first operator "+" (addition) uses the string stored in i as a numerical type.
+   notice how the first operator "+" (which in most if not all languages is numeric addition) using the string stored in i as a numerical type.
    on the next line the "~" (concatenation) operator since 10 is being used by the concatenation operator and the concatenation operator expects strings 
    10 is acted upon as as string.
+   so naturally if 10 is i then 10 concatenated with i is 1010
    
     there are quite a few operators in ltpl
     - addition +
     - subtraction -
     - multiplying *
-    - modulus \
+    - modulus %
     - division /  
     - power ^
     - concatenation ~
-    - split |
+    - split-on |
+    - split-at :
     - expansion !
      
 #+begin_src shell
-    10+10 -> 20
-    10-10 -> 0
-    10*10 -> 100
-    10/10 -> 1
-    10^10 -> 10000000000 
-    
-    10~10 -> 1010
-    100|0 -> 1
-    100! -> 1 0 0 # special operator
+  10+10 -> 20
+  10-10 -> 0
+  10*10 -> 100
+  10/10 -> 1
+  10^10 -> 10000000000 
+
+  10~10 -> 1010
+  100|0 -> 1
+  100:0 ->      #empty string 
+  100! -> 1 0 0 # special operator to be explained
 #+end_src
 
 **** Indexing On Objects
-As said before all objects in ltpl are strings.
-Like all strings you would be able to index into them. 
+As said before all objects in ltpl are strings by default.
+Like in any language containing strings you would be able to index into them and extract certain values.
+
 given the object of: 
 #+begin_src sh
     10
 #+end_src
-Lets say we want to get the second inner object of the of the object.
+Lets say we want to get a sub object of 10
 #+begin_src sh
     10$[1+1] -> 0
     10$[2] -> 0
@@ -175,31 +178,39 @@ Lets say we want to get the second inner object of the of the object.
 the power of programmatic indexing is evident but at times we just want it to be simple. 
 in practice you could 100% do this:
 #+begin_src sh 
-    10$[1] -> 1
+  10$[1] -> 1
 #+end_src
 because the first object that makes up the object primitive 10 is 1
 However you could also write this which is entirely syntactically equivalent to the notation above:
 #+begin_src sh
     10$1
 #+end_src
-Unfortenatly programatic indexing with this syntax is not possible. But it doesnt mean that this syntax isn't sound
+the short hand of indexing into objects are the prefered way to index objects in ltpl.
+the only time the more verbose indexing should be used is when the index given is an object.
+
+naturally you would think that you could index like this.
+but unforentatly you can not. 
 #+begin_src sh 
     10$1+1 -> 2
 #+end_src 
 Instead of giving our desired result of 0 we get 2 due to the fact that ltpl
-sees the object 10$1 as 1 evaluates it then adds 1 which results in 2.
+sees the object 10$1 which evaluates as 1 which is added to 1 which results in 2.
 
 #+begin_src shell
   330$1 is equivalent to 330$[1]
   however 330$1+2 and 330$[1+2] are not.
 #+end_src
 
-
 *** Object References
-*** Fields And Implicit Objects
-**** Fields 
-     Fields are the way that LTPL treats columns of text that are separated by the $FS implicit object.
+like any other scripting or programming language it would be nice to have a way to store data that may change at run time.
+this is where object referances come in.
+object referances can be any letter that is not already defined either implicitly (which we will get to) or defined in your script.
 
+
+
+*** Fields And Implicit Objects
+**** Fields
+     
 *** User Defined Objects
     Objects In LTPL are able to be created by referencing a nonexistent object by using the $.
     typing the example nonsensical case "$bar" is a proper object declaration.
@@ -226,7 +237,7 @@ sees the object 10$1 as 1 evaluates it then adds 1 which results in 2.
      drwxr-xr-x 2 user user  4096 Jan 20 19:42 Templates
      drwxr-xr-x 2 user user  4096 Jan 20 19:42 Videos
 
-     ls -l | LTPL "==$3[~=$3]$foo[p].
+  
 
      drwxr-xr-x 2 user 4096 Jan 20 19:42 Desktop 
      drwxr-xr-x 2 user 4096 Feb  4 00:36 Documents
@@ -236,27 +247,8 @@ sees the object 10$1 as 1 evaluates it then adds 1 which results in 2.
      drwxr-xr-x 2 user 4096 Jan 20 19:42 Public
      drwxr-xr-x 2 user 4096 Jan 20 19:42 Templates
      drwxr-xr-x 2 user 4096 Jan 20 19:42 Videos
-     #+end_sr
-*** Object Arrays And Subfields
-    Sub fields and object arrays are more or less equivalent. with the only real difference is in what is being refereed. to put it simply:
-
-    if it is a field it will be refereed to as a sub field.
-    if it is a user defined object it is refereed to as an object array.
-    /The encompassing term between the two is object array/
-**** Referring To  Object Arrays
-     Below is a dummy file with that we will parse.
-
-     #+begin_src
-     $ cat example.txt
-     hello world this is a tjest.
-
-     if you notice there is a spelling error\\
-     you can fix such a minute error like so\\
-    
-     LTPL Example.txt "--$6$2[~=$6$2]$6$1[>>]$0[p]."\\
      #+end_src
-/where $6 is the 6th field while refering to the 2nd object field. deleting the object in said field and moving the object on the left next to it over where the previous object resided/
-        
+
 ** Reader Directives
 *** What Is A Reader Directive
     A Reader Directive is a command to the intepreter that directs the manner in which the input file will be parsed.
@@ -278,7 +270,7 @@ sees the object 10$1 as 1 evaluates it then adds 1 which results in 2.
       |-------------------+---------------------+--------------+--------------------------|
       | \vert \vert       | column by column    | "\n" Newline | (1,1)                    |
       |-------------------+---------------------+--------------+--------------------------|
-      | ^\vert            | column by column    | "\n" Newline | (1,n)                    |
+      | ^^                | column by column    | "\n" Newline | (1,n)                    |
       |-------------------+---------------------+--------------+--------------------------|
       | --                | Read a single line  | " " Space    | (1,n)                    |
       |-------------------+---------------------+--------------+--------------------------|
@@ -288,7 +280,7 @@ sees the object 10$1 as 1 evaluates it then adds 1 which results in 2.
        
 
 Here is an example on how reader directives can be used with some formated input
-      #+begin_src sh
+      #+begin_src shell
       $ ls -l
 
       drwxr-xr-x 2 user user  4096 Jan 20 19:42 Desktop 
@@ -315,7 +307,7 @@ Here is an example on how reader directives can be used with some formated input
       /where we are getting the 5th element and multiplying it by 1024 and printing the output/
 
 Another way to achieve the same behavior but more efficently would be to do 
-      #+begin_src sh
+      #+begin_src shell
       $ ls -l
 
       drwxr-xr-x 2 user user  4096 Jan 20 19:42 Desktop 
@@ -355,61 +347,79 @@ Examples of the other reader directives being used can be found at .... (havent 
      A Position Specifier may be used in combitation with a Parser Directive to give more flexibilty to the user;
      detailing what subset of data of the input that will be read.
 
-     given the following syntax.\\
-     #+begin_src sh
+     given the following syntax.
+     #+begin_src shell
      "||0,1"
      #+end_src
      /which reads each column skipping the first column entirely/
      
 A practical application to get all of the numbers on line 5 would be
-     #+begin_src sh
+     #+begin_src shell
      $ cat file.txt
      John Doe
      March 21st, 2022
-     John_The_Doe@hotmail.com (because I feel hotmail is funny)
+     John_The_Doe@hotmail.com
      
      10 20 30 40 50
      hello good bye
      
-     $ ltpl file.txt "--5,5[p]"
+     $ ltpl file.txt "--5,5@[p]"
      10 20 30 40 50
      #+end_src
-     /where it reads only one singular line of text at line 5 and prints it/
+/where it reads only one singular line of text at line 5 and prints it/
+
+
+An ltpl implementation of head
+#+begin_src shell
+$ ltpl "1,10@[p]."
+#+end_src
+
+in just a few characters we implemented an entire Unix utility.
+granted its not much however its definely a powerful tool to do this type of thing.
+
+An ltpl implementation of tail
+#+begin_src shell 
+$ ltpl "1,$NF@[p]."
+#+end_src
+
+
+
 ** Actions
 *** What Is An Action
-    An action is the primary enact changes to Objects. they are syntactically represented within [].
+    An action is the primary enact changes to Objects. they are syntactically represented within the [ ].
 **** Example     
-     $ ls -l \\
-     drwxr-xr-x 2 user user  4096 Jan 20 19:42 Desktop \\
-     drwxr-xr-x 2 user user  4096 Feb  4 00:36 Documents \\
-     drwxr-xr-x 3 user user  4096 Feb  6 23:16 Downloads \\
-     drwxr-xr-x 2 user user  4096 Jan 20 19:42 Music \\
-     drwxr-xr-x 2 user user  4096 Jan 20 19:42 Pictures \\ 
-     drwxr-xr-x 2 user user  4096 Jan 20 19:42 Public \\
-     drwxr-xr-x 2 user user  4096 Jan 20 19:42 Templates \\
-     drwxr-xr-x 2 user user  4096 Jan 20 19:42 Videos \\
+#+begin_src shell
+$ ls -l
+     drwxr-xr-x 2 user user  4096 Jan 20 19:42 Desktop 
+     drwxr-xr-x 2 user user  4096 Feb  4 00:36 Documents
+     drwxr-xr-x 3 user user  4096 Feb  6 23:16 Downloads 
+     drwxr-xr-x 2 user user  4096 Jan 20 19:42 Music
+     drwxr-xr-x 2 user user  4096 Jan 20 19:42 Pictures  
+     drwxr-xr-x 2 user user  4096 Jan 20 19:42 Public 
+     drwxr-xr-x 2 user user  4096 Jan 20 19:42 Templates 
+     drwxr-xr-x 2 user user  4096 Jan 20 19:42 Videos
      
-     ls -l | LTPL "==$6[p]" \\
+     ls -l | LTPL "==$6[p]"
      
-     Output: \\
-     Jan \\
-     Feb \\
-     Feb \\ 
-     Jan \\
-     Jan \\
-     Jan \\
-     Jan \\
-     Jan \\
-     
+     Output:
+     Jan 
+     Feb 
+     Feb  
+     Jan 
+     Jan 
+     Jan 
+     Jan 
+     Jan 
+     #+end_src
 *** Actions Predefined
 **** Output And More Output
-     Keeping within the bound of the promise that this is not a scripting language There is no way to prompt users for input what so ever.
-     In LTPL There a variety of different mechinisms that the user to write to a file of their choice.
+Keeping within the bound of the promise that this is not a scripting language There is no way to prompt users for input as in a getchar of some sort you would see in
+other programming languages In LTPL There a variety of different mechinisms that the user to write to a file of their choice. 
 ***** Writing To Files
       What Would a text processing language be with out being able to save the manipulated text to files write to files.
 *** Why Can't I Define My Own Actions
     well there is a simple answer to that. LTPL is not a scripting language. If you feel you need to define your own actions to make a certain action easier. you should look at some other language.
-    consider using AWK or perl. heck sed can be useful in some circumstances. 
+    consider using AWK or perl.
 
  |----------+---------------------------------------------------------------------------------------------------------------------|
  | Name     | Description                                                                                                         |
@@ -477,4 +487,4 @@ A practical application to get all of the numbers on line 5 would be
 | Move Right      | >>            | shifts an object right by one field replacing the object that inhabited that location | none                           | ---$1[>>]$2[p].                                 |
 | Move Left       | <<            | shifts an object left by one field replacing the object that inhabited that location  | none                           |                                                 |
 |-----------------+---------------+---------------------------------------------------------------------------------------+--------------------------------+-------------------------------------------------|
-  
+

@@ -1,10 +1,10 @@
 (defpackage :object-stream
-   (:use :cl)	
-   (:local-nicknames))
+  (:use :cl)
+  (:local-nicknames))
 
-;; (in-package :object-stream)
+(in-package :object-stream)
 
-(in-package :object-stream-tester)
+;; (in-package :object-stream-tester)
 
 (defclass object-stream ()
   ((objects
@@ -12,9 +12,7 @@
    (read-objects
     :initform '())))
 
-(in-package :ltpl)
 (defgeneric read-object (object-stream))
-
 (defgeneric unread-object (object-stream))
 (defgeneric read-objects (object-stream number))
 (defgeneric unread-objects (object-stream number))
@@ -36,11 +34,15 @@
   (let ((obj (read-object object-stream)))
     (unread-object object-stream) obj))
 
+(defmethod peek-previous (object-stream)
+  (let ((obj (unread-object-stream)))
+    (read-object object-stream) obj))
+
 (defmethod write-object (object-stream object)
   (setf (slot-value object-stream 'objects) (append (slot-value object-stream 'objects) (list object))))
 
 (defmethod write-objects (object-stream objects)
-  (loop for i in (reverse objects) do
+  (loop :for i :in (reverse objects) do
     (write-object object-stream i))
   objects)
 
@@ -60,7 +62,7 @@
 
 (defmethod read-objects (object-stream number)
   (let ((acc '()))
-    (loop for i from 1 to number do
+    (loop :for i :from 1 :to number :do
       (setf acc (append acc (list (read-object object-stream)))))
     acc))
 
@@ -71,7 +73,7 @@
 
 (defmethod unread-objects (object-stream number)
   (let ((acc '()))
-    (loop :for i from 0 to number do
+    (loop :for i :from 0 to number :do
       (setf acc (append acc (list (read-object object-stream))))
       (unread-object object-stream))
     acc))

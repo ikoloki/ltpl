@@ -9,12 +9,16 @@
    This is a tool mainly for programmers and users who require rigid formatted text output. Specifically targeting
    those who would traditionally use sed to do so.
 ** Why Does This Exist ?
-   I wanted a utility for text processing that was more flexible than Sed but more terse than awk that
-   that didn't contain the C-isms that was carried over as baggage from the Bell Labs Unix style thought process when designing awk.
+   I wanted a utility that had the power of awk in some ways but less C like.
+   sed exists but the issue I find with sed its it is very regular expression like and it can be hard to read.
+   lplt isnt easy to read by any stretch of the imagination but I find it easier to read than sed.
 ** What This Tool Is
 *** It is a Utility For Text Manipulation
-    LTPL is more a utility along the lines of sed and awk than an actual language you would write in a file.
+   ltpl is more a utility along the lines of sed and awk than an actual language you would write in a file.
     It meant to be embedded in sh scripts and to be used either along side or be more versatile than more traditional tools.
+*** It is a Sed replacement
+    Sed is the standard stream editor that allows you to edit files and streams much like lptl does.
+    however the issue with sed is that sed isnt 
 ** What This Tool Is Not    
 *** It Is Not /Complete/ Replacement For Awk. 
     I am only comparing my language periodically to awk as the closest parallel of the language that exists and is in relative popular use today.
@@ -24,6 +28,8 @@
 *** It Is Not A General Purpose Scripting Language
     This tool is not for all intensive purposes is not a scripting language nor should it ever be used as one.
     LTPL is a terse and simple text processing utility and nothing more.
+
+    
 ** Why The Cryptic Syntax
    LTPL's syntax and grammar is very simple aiming and being simple to use in a terminal environment.
    With this consideration taken a APL or Regular expression like syntax was considered appropriate for a speedy interactive usage that I was trying to achieve.
@@ -86,7 +92,7 @@ quote like so:
    \LINEFEED
    \CARRIAGE_RET
    \TAB 
-   \__  #for whitespace
+   \__
    \BEEP 
 #+end_src
 This is all fine and dandy but in C and other languages those aren't are not the only things you would need to escape
@@ -195,7 +201,6 @@ but unforentatly you can not.
 #+end_src 
 Instead of giving our desired result of 0 we get 2 due to the fact that ltpl
 sees the object 10$1 which evaluates as 1 which is added to 1 which results in 2.
-
 #+begin_src shell
   330$1 is equivalent to 330$[1]
   however 330$1+2 and 330$[1+2] are not.
@@ -205,49 +210,42 @@ sees the object 10$1 which evaluates as 1 which is added to 1 which results in 2
 like any other scripting or programming language it would be nice to have a way to store data that may change at run time.
 this is where object referances come in.
 object referances can be any letter that is not already defined either implicitly (which we will get to) or defined in your script.
-
-
-
-*** Fields And Implicit Objects
-**** Fields
-     
-*** User Defined Objects
-    Objects In LTPL are able to be created by referencing a nonexistent object by using the $.
-    typing the example nonsensical case "$bar" is a proper object declaration.
 *** Assignment
     Defining new variables along with reassigning existing ones are core parts of any programming language (except for the Haskell purists out there)
-    LTPL is no different but has a quirk to do so.
-**** Examples     
+    ltpl is no different;
 #+begin_src shell
-     ltpl example.txt "==$bar[10]."
-     ltpl example.txt "==$foo."
+  ltpl example.txt "$bar[10]"
+  ltpl example.txt "$foo[10+9]"
+  ltpl example.txt "$var"
 #+end_src
-     /both of which are valid instances of objects where foo is assigned to an empty string by default and bar is assigned to 10/ \\
-     
-#+begin_src
+in this example foo and bar are 10, while the uninitialized the var's value is defaulted to empty string.
+    
+*** Hierarchy Tree Structure
+In ltpl ALL objects are actually tree structures that contain a variety of meta data.
+All ltpl objects primitive or references contain the lowest decomposible slice of an object and its length.
 
-     $ ls 
+we saw this behavior in an introduction to objects.
 
-     drwxr-xr-x 2 user user  4096 Jan 20 19:42 Desktop
-     drwxr-xr-x 2 user user  4096 Feb  4 00:36 Documents
-     drwxr-xr-x 3 user user  4096 Feb  6 23:16 Downloads
-     drwxr-xr-x 2 user user  4096 Jan 20 19:42 Music 
-     drwxr-xr-x 2 user user  4096 Jan 20 19:42 Pictures
-     drwxr-xr-x 2 user user  4096 Jan 20 19:42 Public 
-     drwxr-xr-x 2 user user  4096 Jan 20 19:42 Templates
-     drwxr-xr-x 2 user user  4096 Jan 20 19:42 Videos
+(insert image here of tree)
 
-  
+This is an example of getting the length of the objects.
+#+begin_src shell
+  $10$# = 2
+  $foo$# = 3
+#+end_src
 
-     drwxr-xr-x 2 user 4096 Jan 20 19:42 Desktop 
-     drwxr-xr-x 2 user 4096 Feb  4 00:36 Documents
-     drwxr-xr-x 3 user 4096 Feb  6 23:16 Downloads
-     drwxr-xr-x 2 user 4096 Jan 20 19:42 Music
-     drwxr-xr-x 2 user 4096 Jan 20 19:42 Pictures
-     drwxr-xr-x 2 user 4096 Jan 20 19:42 Public
-     drwxr-xr-x 2 user 4096 Jan 20 19:42 Templates
-     drwxr-xr-x 2 user 4096 Jan 20 19:42 Videos
-     #+end_src
+*** Implicit Objects and Fields
+Due to the brevity of and the intended user environment of the language. 
+The decision of adding implicitly or automatically was made.
+Not all of which will be covered in this section however the most useful of which will be covered.
+
+(ill cover that at some point)
+
+Before discussing the most useful and relevant use we need to cover the most useful and relvent part of ltpl.
+that being fields.
+
+Fields are just like any other implicit object
+
 
 ** Reader Directives
 *** What Is A Reader Directive
@@ -277,32 +275,31 @@ object referances can be any letter that is not already defined either implicitl
       | <=                | read right to left  | " " Space    | (n,1)                    |
       |-------------------+---------------------+--------------+--------------------------|
        /where n is the number of elements in that row or column/
-       
 
 Here is an example on how reader directives can be used with some formated input
       #+begin_src shell
-      $ ls -l
+        $ ls -l
 
-      drwxr-xr-x 2 user user  4096 Jan 20 19:42 Desktop 
-      drwxr-xr-x 2 user user  4096 Feb  4 00:36 Documents
-      drwxr-xr-x 3 user user  4096 Feb  6 23:16 Downloads
-      drwxr-xr-x 2 user user  4096 Jan 20 19:42 Music 
-      drwxr-xr-x 2 user user  4096 Jan 20 19:42 Pictures
-      drwxr-xr-x 2 user user  4096 Jan 20 19:42 Public 
-      drwxr-xr-x 2 user user  4096 Jan 20 19:42 Templates 
-      drwxr-xr-x 2 user user  4096 Jan 20 19:42 Videos
+        drwxr-xr-x 2 user user  4096 Jan 20 19:42 Desktop 
+        drwxr-xr-x 2 user user  4096 Feb  4 00:36 Documents
+        drwxr-xr-x 3 user user  4096 Feb  6 23:16 Downloads
+        drwxr-xr-x 2 user user  4096 Jan 20 19:42 Music 
+        drwxr-xr-x 2 user user  4096 Jan 20 19:42 Pictures
+        drwxr-xr-x 2 user user  4096 Jan 20 19:42 Public 
+        drwxr-xr-x 2 user user  4096 Jan 20 19:42 Templates 
+        drwxr-xr-x 2 user user  4096 Jan 20 19:42 Videos
 
-      $ ls -l | ltpl "==$5[*:1024][p]."
-      Output: 
-           
-      4194304 
-      4194304 
-      4194304 
-      4194304 
-      4194304 
-      4194304
-      4194304
-      4194304 
+        $ ls -l | ltpl "==$5[*:1024][p]."
+        Output: 
+
+        4194304 
+        4194304 
+        4194304 
+        4194304 
+        4194304 
+        4194304
+        4194304
+        4194304 
       #+end_src 
       /where we are getting the 5th element and multiplying it by 1024 and printing the output/
 
@@ -355,16 +352,16 @@ Examples of the other reader directives being used can be found at .... (havent 
      
 A practical application to get all of the numbers on line 5 would be
      #+begin_src shell
-     $ cat file.txt
-     John Doe
-     March 21st, 2022
-     John_The_Doe@hotmail.com
-     
-     10 20 30 40 50
-     hello good bye
-     
-     $ ltpl file.txt "--5,5@[p]"
-     10 20 30 40 50
+       $ cat file.txt
+       John Doe
+       March 21st, 2022
+       John_The_Doe@hotmail.com
+
+       10 20 30 40 50
+       hello good bye
+
+       $ ltpl file.txt "--5,5@[p]"
+       10 20 30 40 50
      #+end_src
 /where it reads only one singular line of text at line 5 and prints it/
 
@@ -379,7 +376,7 @@ granted its not much however its definely a powerful tool to do this type of thi
 
 An ltpl implementation of tail
 #+begin_src shell 
-$ ltpl "1,$NF@[p]."
+$ ltpl "$NF-10,$NF@[p]."
 #+end_src
 
 
@@ -399,7 +396,7 @@ $ ls -l
      drwxr-xr-x 2 user user  4096 Jan 20 19:42 Templates 
      drwxr-xr-x 2 user user  4096 Jan 20 19:42 Videos
      
-     ls -l | LTPL "==$6[p]"
+     ls -l | LTPL "==@$6[p]"
      
      Output:
      Jan 
@@ -465,26 +462,29 @@ other programming languages In LTPL There a variety of different mechinisms that
 
 
       
-|-----------------+---------------+---------------------------------------------------------------------------------------+--------------------------------+-------------------------------------------------|
-| Name            | Symbolic Name | Description                                                                           | Possible Arguments             | Examples                                        |
-|                 |               |                                                                                       |                                |                                                 |
-|-----------------+---------------+---------------------------------------------------------------------------------------+--------------------------------+-------------------------------------------------|
-| print           | p             | Prints an object to stdout                                                            | p -red -green -blue \vert none | ---$1[p 255,0,0].                               |
-| write           | w             | writes objects to a file                                                              | w -filename \vert -filename    | ---$0[w file.txt].                              |
-|-----------------+---------------+---------------------------------------------------------------------------------------+--------------------------------+-------------------------------------------------|
-| filter          | ~             | removes if condition is true                                                          | ~ -logical operator -object    | ---$0[~=10][p].                                 |
-|-----------------+---------------+---------------------------------------------------------------------------------------+--------------------------------+-------------------------------------------------|
-| ternary         | ?             | does the next action if true the action after if false                                | ? - logical operator object    | ---$1[?:=:10]Success[p:0:255:0]fail[p:255:0:0]. |
-|-----------------+---------------+---------------------------------------------------------------------------------------+--------------------------------+-------------------------------------------------|
-| italic          | I             | underlines the object when printed                                                    | none                           | ---$0[i][p].                                    |
-| bold            | B             | underlines an object when printed                                                     | none                           |                                                 |
-| underline       | _             | underlines an object when printed                                                     | none                           | ---$0[_][p].                                    |
-| highlight       | #             | highlights an object                                                                  | none                           | ---$0[#:$RED][p]                                |
-| color text      | cl            | colors an object when printed                                                         |                                |                                                 |
-| shift down line | VV            | shfits an object down into the line below it.                                         |                                |                                                 |
-| shift up line   | ^^            |                                                                                       |                                |                                                 |
-| Swap lines      |               |                                                                                       |                                |                                                 |
-| Move Right      | >>            | shifts an object right by one field replacing the object that inhabited that location | none                           | ---$1[>>]$2[p].                                 |
-| Move Left       | <<            | shifts an object left by one field replacing the object that inhabited that location  | none                           |                                                 |
-|-----------------+---------------+---------------------------------------------------------------------------------------+--------------------------------+-------------------------------------------------|
+|------------------+---------------+---------------------------------------------------------------------------------------+--------------------------------+-------------------------------------------------|
+| Name             | Symbolic Name | Description                                                                           | Possible Arguments             | Examples                                        |
+|                  |               |                                                                                       |                                |                                                 |
+|------------------+---------------+---------------------------------------------------------------------------------------+--------------------------------+-------------------------------------------------|
+| print            | p             | Prints an object to stdout                                                            | p -red -green -blue \vert none | ---$1[p 255,0,0].                               |
+| write            | w             | writes objects to a file                                                              | w -filename \vert -filename    | ---$0[w file.txt].                              |
+|------------------+---------------+---------------------------------------------------------------------------------------+--------------------------------+-------------------------------------------------|
+| filter           | ~             | removes if condition is true                                                          | ~ -logical operator -object    | ---$0[~=10][p].                                 |
+|------------------+---------------+---------------------------------------------------------------------------------------+--------------------------------+-------------------------------------------------|
+| ternary          | ?             | does the next action if true the action after if false                                | ? - logical operator object    | ---$1[?:=:10]Success[p:0:255:0]fail[p:255:0:0]. |
+|------------------+---------------+---------------------------------------------------------------------------------------+--------------------------------+-------------------------------------------------|
+| italic           | I             | underlines the object when printed                                                    | none                           | ---$0[i][p].                                    |
+| bold             | B             | underlines an object when printed                                                     | none                           |                                                 |
+| underline        | _             | underlines an object when printed                                                     | none                           | ---$0[_][p].                                    |
+| highlight        | #             | highlights an object                                                                  | none                           | ---$0[#:$RED][p]                                |
+|------------------+---------------+---------------------------------------------------------------------------------------+--------------------------------+-------------------------------------------------|
+| shift down line  | VV            | shfits a line down into the line below it.                                            |                                |                                                 |
+| shift up line    | ^^            | shifts a line  up to the line above it.                                               |                                |                                                 |
+| Swap lines       | <<>>          | trades positions of lines                                                             |                                |                                                 |
+| shift field down | V             | replaces object of the next line and the same field                                   |                                |                                                 |
+| shift field up   | ^             |                                                                                       |                                |                                                 |
+| Move Right       | >>            | shifts an object right by one field replacing the object that inhabited that location | none                           | ---$1[>>]$2[p].                                 |
+| Move Left        | <<            | shifts an object left by one field replacing the object that inhabited that location  | none                           |                                                 |
+|------------------+---------------+---------------------------------------------------------------------------------------+--------------------------------+-------------------------------------------------|
+
 

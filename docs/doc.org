@@ -211,28 +211,47 @@ like any other scripting or programming language it would be nice to have a way 
 this is where object referances come in.
 object referances can be any letter that is not already defined either implicitly (which we will get to) or defined in your script.
 *** Assignment
-    Defining new variables along with reassigning existing ones are core parts of any programming language (except for the Haskell purists out there)
-    ltpl is no different;
+Defining new variables along with reassigning existing ones are core parts of any programming language (except for the Haskell purists out there)
+ltpl is no different;
 #+begin_src shell
-  ltpl example.txt "$bar[10]"
-  ltpl example.txt "$foo[10+9]"
-  ltpl example.txt "$var"
+  ltpl example.txt "bar[10]"
+  ltpl example.txt "foo[10+9]"
 #+end_src
-in this example foo and bar are 10, while the uninitialized the var's value is defaulted to empty string.
-    
-*** Hierarchy Tree Structure
-In ltpl ALL objects are actually tree structures that contain a variety of meta data.
-All ltpl objects primitive or references contain the lowest decomposible slice of an object and its length.
+in this example foo and bar are 10
 
-we saw this behavior in an introduction to objects.
+So simply declaring objects like above is fine however you in some cases you would want to be more descriptive. Such as constants
+or defining special behavior for certain objects with the use of declaration tags.
+**** Declaration tags
+the tags in ltpl consist of the following:
+| assignment          | meaning                                                                     |
+|---------------------+-----------------------------------------------------------------------------|
+| bar[10:const]       | bar cannot be changed what so ever in any way for the existence of program. |
+| bar[10:subobj:$foo] | bar is now a sub object of foo and now can be accessed as $foo$bar          |
+| bar[10:final]       | bar is now unable to be appended with something                             |
+| bar[10:infinal]     | bar is now unable be added as a subobject to something                      |
+| bar[10:begin]       | bar is only designed once at the begining of the program                    |
+| bar[10:end]         | bar is assigned after the last line of the program is read                  |
+|---------------------+-----------------------------------------------------------------------------|
 
-(insert image here of tree)
+ltpl example.txt
+*** Hierarchy Tree Structure 
+So In the previous sections particularly indexing on objects it gets more complex than treating objects like arrays.
+In ltpl *ALL* objects are actually tree structures that contain a variety of meta data.
+All ltpl objects primitive or references contain the lowest decomposable unit of an object and its length.
+
+Given the example of ltpl object /hello/ for example
+#+ATTR_ORG: :width 768
+[[file:/
+
+
+
+
 
 This is an example of getting the length of the objects.
 #+begin_src shell
-  $10$# = 2
-  $foo$# = 3
-#+end_src
+    $10$# = 2
+    $foo$# = 3
+    #+end_src
 
 *** Implicit Objects and Fields
 Due to the brevity of and the intended user environment of the language. 
@@ -418,48 +437,50 @@ other programming languages In LTPL There a variety of different mechinisms that
     well there is a simple answer to that. LTPL is not a scripting language. If you feel you need to define your own actions to make a certain action easier. you should look at some other language.
     consider using AWK or perl.
 
- |----------+---------------------------------------------------------------------------------------------------------------------|
- | Name     | Description                                                                                                         |
- |----------+---------------------------------------------------------------------------------------------------------------------|
- | $0       | The 0th field refering to the whole line of text. That contains an object array of the                              |
- |----------+---------------------------------------------------------------------------------------------------------------------|
- | $n       | The $nth field that refers to an object that is broken up into fields by the $FS                                    |
- |----------+---------------------------------------------------------------------------------------------------------------------|
- | $FS      | the delimiting character(s) that designantes the seperation of new tokens by a user defined or ltpl specified token |
- |----------+---------------------------------------------------------------------------------------------------------------------|
- | $CL      | the current line being read                                                                                         |
- |----------+---------------------------------------------------------------------------------------------------------------------|
- | $PL      | previous line read                                                                                                  |
- |----------+---------------------------------------------------------------------------------------------------------------------|
- | $NL      | the next line to be read.                                                                                           |
- |----------+---------------------------------------------------------------------------------------------------------------------|
- | $NLR     | the number of lines that have been read.                                                                            |
- |----------+---------------------------------------------------------------------------------------------------------------------|
- | $NTR     | the number of lines that need to be read.                                                                           |
- |----------+---------------------------------------------------------------------------------------------------------------------|
- | $RED     | The Color Red 255 0 0                                                                                               |
- |----------+---------------------------------------------------------------------------------------------------------------------|
- | $GREEN   | The Color Green 0 255 0                                                                                             |
- |----------+---------------------------------------------------------------------------------------------------------------------|
- | $BLUE    | The Color Blue                                                                                                      |
- |----------+---------------------------------------------------------------------------------------------------------------------|
- | $BLACK   |                                                                                                                     |
- |----------+---------------------------------------------------------------------------------------------------------------------|
- | $WHITE   |                                                                                                                     |
- |----------+---------------------------------------------------------------------------------------------------------------------|
- | $CYAN    |                                                                                                                     |
- |----------+---------------------------------------------------------------------------------------------------------------------|
- | $MAGENTA |                                                                                                                     |
- |----------+---------------------------------------------------------------------------------------------------------------------|
- | $YELLOW  |                                                                                                                     |
- |----------+---------------------------------------------------------------------------------------------------------------------|
- | $PURPLE  |                                                                                                                     |
- |----------+---------------------------------------------------------------------------------------------------------------------|
- | $PINK    |                                                                                                                     |
- |----------+---------------------------------------------------------------------------------------------------------------------|
- | $ORANGE  |                                                                                                                     |
- |----------+---------------------------------------------------------------------------------------------------------------------|
+ |------+--------------------------------------------------------------------------------------------------------------------|
+ | Name | Description                                                                                                        |
+ |------+--------------------------------------------------------------------------------------------------------------------|
+ | $0   | The 0th field refering to the whole line of text. That contains an object array of the                             |
+ |------+--------------------------------------------------------------------------------------------------------------------|
+ | $N   | The $nth field that refers to an object that is broken up into fields by the $FS                                   |
+ |------+--------------------------------------------------------------------------------------------------------------------|
+ | $FS  | The delimiting character(s) that designates the separation of new tokens by a user defined or ltpl specified token |
+ |------+--------------------------------------------------------------------------------------------------------------------|
+ | $LS  | The delimiting character(s) that Separate lines                                                                    |
+ |------+--------------------------------------------------------------------------------------------------------------------|
+ | $CL  | the current line being read                                                                                        |
+ |------+--------------------------------------------------------------------------------------------------------------------|
+ | $PL  | previous line read                                                                                                 |
+ |------+--------------------------------------------------------------------------------------------------------------------|
+ | $NL  | the next line to be read.                                                                                          |
+ |------+--------------------------------------------------------------------------------------------------------------------|
+ | $NLR | the number of lines that have been read.                                                                           |
+ |------+--------------------------------------------------------------------------------------------------------------------|
+ | $NTR | the number of lines that need to be read.                                                                          |
 
+ |----------+--------------------------------------------------------------------------------------------------------------------|
+ | $RED     | The Color Red 255 0 0                                                                                              |
+ |----------+--------------------------------------------------------------------------------------------------------------------|
+ | $GREEN   | The Color Green 0 255 0                                                                                            |
+ |----------+--------------------------------------------------------------------------------------------------------------------|
+ | $BLUE    | The Color Blue                                                                                                     |
+ |----------+--------------------------------------------------------------------------------------------------------------------|
+ | $BLACK   |                                                                                                                    |
+ |----------+--------------------------------------------------------------------------------------------------------------------|
+ | $WHITE   |                                                                                                                    |
+ |----------+--------------------------------------------------------------------------------------------------------------------|
+ | $CYAN    |                                                                                                                    |
+ |----------+--------------------------------------------------------------------------------------------------------------------|
+ | $MAGENTA |                                                                                                                    |
+ |----------+--------------------------------------------------------------------------------------------------------------------|
+ | $YELLOW  |                                                                                                                    |
+ |----------+--------------------------------------------------------------------------------------------------------------------|
+ | $PURPLE  |                                                                                                                    |
+ |----------+--------------------------------------------------------------------------------------------------------------------|
+ | $PINK    |                                                                                                                    |
+ |----------+--------------------------------------------------------------------------------------------------------------------|
+ | $ORANGE  |                                                                                                                    |
+ |----------+--------------------------------------------------------------------------------------------------------------------|
 
       
 |------------------+---------------+---------------------------------------------------------------------------------------+--------------------------------+-------------------------------------------------|

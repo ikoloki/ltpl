@@ -4,7 +4,7 @@
   (literal)
   (symbol))
 
-(defparameter *test* "==100,1@(.*(A-Z))$0$10![w:file.txt]$foo[p]$foo$[100+1]")
+;; (defparameter *test* "==100,1@(.*(A-Z))$0$10![w:file.txt]$foo[p]$foo$[100+1]")
 (defun tokenize (input-stream)
   "takes tokens from the *input-stream* and processes them util the end"
   (let* ((directive (tokenize-directive (with-output-to-string (tmp-stream)
@@ -23,7 +23,6 @@
                   ((eq c #\,) (push (tokenize-comma c) tokens))
                   ((eq c #\$) (push (tokenize-object input-stream c) tokens))
                   ((eq c #\.) (push (tokenize-object input-stream c) tokens))
-                  ((eq c #\_) (push (tokenize-space input-stream c) tokens))
                   ((eq c #\|) (push (tokenize-bar input-stream c) tokens))
                   ((eq c #\*) (push (tokenize-star input-stream c) tokens))
                   ((eq c #\') (filter-comment input-stream c))
@@ -56,7 +55,7 @@
                          :for i from 0
                          :if (null c) :do
                            (loop-finish)
-                         :else :if (and (eq c #\.) (null floating-point)):do
+                         :else :if (and (eq c #\.) (null floating-point)) :do
                            (write-char c output-stream)
                            (setf floating-point t)
                          :else :if (alphanumericp c) :do
@@ -66,9 +65,9 @@
                          :else :do
                            (unread-char c input-stream)
                            (loop-finish)))))
-    (if (eq (char object 0) #\$)
-        (make-token :literal object :symbol 'object-ref)
-        (make-token :literal object :symbol 'object-primitive))))
+                   (if (eq (char object 0) #\$)
+                       (make-token :literal object :symbol 'object-ref)
+                       (make-token :literal object :symbol 'object-primitive))))
 
 (defun tokenize-directive (directive)
   "looks for a specific way to parse a file"
@@ -82,12 +81,13 @@
         :else :if (eq c #\') :do
           (loop-finish)))
 
-(defun tokenize-space (input-stream c)
-  "tokenizes the space token in ltpl"
-  (when (and (eq c #\_) (eq (read-char input-stream) #\)))
-    (return-from tokenize-space (make-token :literal "__" :symbol 'operator)))
-  (unread-char input-stream)
-  (make-token :literal #\_ :symbol 'operator))
+;; (defun tokenize-space (input-stream c)
+;;   "tokenizes the space token in ltpl"
+;;   ;; TODO INDEX -1 error 
+;;   (when (and (eq c #\_) (eq (read-char input-stream) #\)))
+;;     (return-from tokenize-space (make-token :literal "__" :symbol 'operator)))
+;;   (unread-char input-stream)
+;;   (make-token :literal #\_ :symbol 'operator))
 
 (defun operatorp (input-stream c)
   (let ((operators '(#\/ #\+ #\- #\% #\! #\~)))
@@ -97,16 +97,17 @@
 
 (defun tokenize-bar (input-stream c)
   "determines if its a the split at or the split operator"
-  (when (and (eq c #\|) (eq (read-char input-stream) #\|))
+  (when (and (char= c #\|) (char= (read-char input-stream) #\|))
     (return-from tokenize-bar (make-token :literal "||" :symbol 'operator)))
   (unread-char input-stream)
   (make-token :literal #\| :symbol 'operator))
 
 (defun tokenize-star (input-stream c)
   "determines if its a exponent or a multiplication"
-  (when (and (eq c #\*) (eq (read-char input-stream) #\*))
+  ;;  (break (format nil "~a" c))
+  (when (and (char= c #\*) (char= (read-char input-stream) #\*))
     (return-from tokenize-star (make-token :literal "**" :symbol 'operator)))
-  (unread-char input-stream)
+  (unread-char c input-stream)
   (make-token :literal #\* :symbol 'operator))
 
 (defun tokenize-escape (input-stream c)
@@ -140,5 +141,3 @@
 
 (defun tokenize-reader-end (c)
   (make-token :literal (string c) :symbol 'reader-end))
-
-;; (defparameter *test* "==100,1@(.*(A-Z))$0$10![w:file.txt]$foo[p]$foo$[100+1]")

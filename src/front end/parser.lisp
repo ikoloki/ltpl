@@ -20,9 +20,6 @@
 (defstruct box
   (data))
 
-(defmacro make-pair (obj1 obj2)
-  `(cons ,obj1 ,obj2))
-
 (defmacro string-join (str1 str2)
   `(concatenate 'string ,str1 ,str2))
 
@@ -38,7 +35,7 @@
     (let* ((ast (make-box :data (make-node :data nil :left nil :right nil)))
            (error-list '()))
       (when (null next)
-        (enqueue (make-pair "Encountered End Of Line At Beginning Of Token Stream" 'error) error-list))
+        (enqueue (cons "Encountered End Of Line At Beginning Of Token Stream" 'error) error-list))
 
       (parse-reader next input-stream error-list ast))))
 
@@ -46,7 +43,6 @@
   "parses valid reader directives"
   (with-next-token input-stream
     (let ((curr-symbol nil))
-
       (setf curr-symbol
             (cond ((string= (token-literal token) "--") 'line)
                   ((string= (token-literal token) "==") 'normal)
@@ -54,130 +50,184 @@
                   ((string= (token-literal token) "<=") 'backwards)
                   ((string= (token-literal token) "^^") 'bottom-up)
                   (t 'error)))
+      (break  (format nil "~a" token))
 
-      (break (token-literal token))
-      (cond ((eq curr-symbol 'error) (enqueue (make-pair (string-join "Found Unknown Reader-directive: " next-literal) 'error) error-list))
-            ((null (token-symbol token)) (enqueue (make-pair "Found End Of line Reader Directive:" 'error) error-list)))
+      (cond ((eq curr-symbol 'error)
+             (enqueue (cons (string-join "Found Unknown Reader-directive: " next-literal) 'error) error-list)
+             (parse-unknown-token token input-stream error-list ast))
+
+            ((null (token-symbol token))
+             (enqueue (cons "Found End Of line Reader Directive:" 'error) error-list)))
 
       (unless (eq-or curr-symbol 'error nil)
-        (break "before insertion")
-        (insert-node (box-data ast) token)
-        (break "after insertion"))
+        (insert-node (box-data ast) token))
 
-        (case next-symbol
+      (case next-symbol
         (object-ref (parse-object-ref next input-stream error-list ast))
-        (object-primitive (parse-object-ref next input-stream error-list ast))
+        (object-primitive (parse-object-primitive next input-stream error-list ast))
         (regex (parse-regex next input-stream error-list ast))
-        (reader-end (break "in case") (parse-reader-end next input-stream error-list ast))
-        (otherwise (enqueue (make-pair (string-join "Expected Expression, Object Or Reader End But Found: " next-literal) 'error) error-list))))
-    (make-pair ast error-list)))
+        (reader-end (parse-reader-end next input-stream error-list ast))
+        (otherwise (enqueue (cons (string-join "Expected Expression, Object Or Reader End But Found: " next-literal) 'error) error-list)))
+      (cons ast error-list))))
 
 (defun parse-escape (token input-stream error-list ast)
   (with-next-token input-stream
+
+    (setf (token-symbol token)
+          (case (token-symbol token)
+            (action-begin 'action-begin)
+            (arg-delim 'action-arg)
+            (range-delim 'range-arg)
+            (otherwise 'esc)))
+
+    (if (and (eq (token-symbol token) 'action-end)
+             (eq next-symbol 'action-begin))
+        (setf (token-symbol token) 'working-object))
+
     (let ((possible-literal
-            (cond ((string= next-literal "\BEEP")      (code-char 7))
-                  ((string= next-literal "\BACKSPACE") (code-char 8))
-                  ((string= next-literal "\TAB")       (code-char 9))
-                  ((string= next-literal "\VTAB")      (code-char 11))
-                  ((string= next-literal "\CRETURN")   (code-char 13))
-                  ((string= next-literal "\NEWLINE")   (code-char 10))
-                  ((string= next-literal "\FFEED")     (code-char 12))
+            (cond ((string= next-literal "BEEP")      (string (code-char 7)))
+                  ((string= next-literal "BACKSPACE") (string (code-char 8)))
+                  ((string= next-literal "TAB")       (string (code-char 9)))
+                  ((string= next-literal "VTAB")      (string (code-char 11)))
+                  ((string= next-literal "CRETURN")   (string (code-char 13)))
+                  ((string= next-literal "NEWLINE")   (string (code-char 10)))
+                  ((string= next-literal "FFEED")     (string (code-char 12)))
+                  ((string= next-literal "__")        (string #\SPACE))
                   (t 'error))))
 
-      (cond ((null possible-literal) (enqueue (make-pair "Encountered End Of Line After Escape Sequence: " 'error) error-list))
-            (t (enqueue (make-pair (string-join "Encountered Unrecognized Escape Sequence: " next-literal) 'error) error-list)))
+      (cond ((null possible-literal) (enqueue (cons "Encountered End Of Line After Escape Sequence: " 'error) error-list))
+            (t (enqueue (cons (string-join "Encountered Unrecognized Escape Sequence: " next-literal) 'error) error-list)))
 
       (case next-symbol
         (object-ref (parse-object-ref next input-stream error-list ast))
         (operator (parse-operator next input-stream error-list ast))
-        (otherwise (enqueue (make-pair (string-join "Expected Object Reference But Found: " next-literal) ' error) error-list))))))
+        (otherwise (enqueue (cons (string-join "Expected Object Reference But Found: " next-literal) ' error) error-list))))))
 
 (defun parse-object-ref (token input-stream error-list ast)
   (with-next-token input-stream
 
-    (insert-node (box-data ast) token)
+    (break (format nil "~a" next))
 
+    (setf (token-symbol token)
+          (case (token-symbol token)
+            (action-begin 'action)
+            (arg-delim 'action-arg)
+            (range-delim 'range-arg)
+            (otherwise 'object-ref)))
+
+    (if (and (eq (token-symbol token) 'action-end)
+             (eq next-symbol 'action-begin))
+        (setf (token-symbol token) 'working-object-ref))
+
+    (insert-node (car (box-data ast)) token)
     (cond ((string= next-literal "$") (parse-action token input-stream error-list ast))
-          ((null (make-pair (string-join "Encountered End Of Line After Object Reference: " (token-literal token)) 'error))))
+          ((null (cons (string-join "Encountered End Of Line After Object Reference: " (token-literal token)) 'error))))
 
     (case next-symbol
       (object-ref (parse-object-ref next input-stream error-list ast))
       (range-delim (parse-range next input-stream error-list ast))
       (arg-delim (parse-arg next input-stream error-list ast))
-      (otherwise (enqueue (make-pair (string-join "Unknown Or Invalid Token After Object Reference: " next-literal) 'error) error-list))))
-  (make-pair ast error-list))
+      (action-reader-end (parse-reader-end next input-stream error-list ast))
+      (otherwise (enqueue (cons (string-join "Unknown Or Invalid Token After Object Reference: " next-literal) 'error) error-list))))
+  (cons ast error-list))
 
 (defun parse-object-primitive (token input-stream error-list ast)
   (with-next-token input-stream
-    (break (format nil "in parse object primitive (token literal :~a) ~% (next-literal ~a)" (token-literal token) next-literal))
+    (setf (token-symbol token)
+          (case (token-symbol token)
+            (action-begin 'action)
+            (arg-delim 'action-arg)
+            (range-delim 'range-arg)
+            (otherwise 'object-primitive)))
+
+    (break (format nil "~a" next))
+
+    (when (and (eq (token-symbol token) 'action-end)
+            (eq next-symbol 'action-begin))
+        (setf (token-symbol token) 'working-object))
+
     (insert-node (box-data ast) token)
-
-     (when (null next)
-       (enqueue (make-pair "Encountered End Of Line After Object Reference: " 'error) error-list))
-
-     (case next-symbol
-       (action-begin (parse-action next input-stream error-list ast))
-       (range-delim (parse-range next input-stream error-list ast))
-       (object-ref (parse-object-ref next input-stream error-list ast))
-       (operator (parse-operator token input-stream error-list ast))
-        (make-pair ast error-list))))
+    (break (format nil "~a before nil check" next))
+    (when (null next)
+      (enqueue (cons "Encountered End Of Line After Object Reference: " 'error) error-list))
+    (break (format nil "~a" next))
+    ;; checking the previous token to determine what the object primitive is
+    (case next-symbol
+      (action-begin (parse-action next input-stream error-list ast))
+      (range-delim (parse-range next input-stream error-list ast))
+      (object-ref (parse-object-ref next input-stream error-list ast))
+      (parse-reader-end (parse-reader-end next input-stream error-list ast))
+      (operator (parse-operator next input-stream error-list ast))
+      (cons ast error-list))))
 
 (defun parse-regex (token input-stream error-list ast)
   (with-next-token input-stream
+
+    (break (format nil "~a" token))
+
     (insert-node (box-data ast) token)
+
     ;; Check and see if the token is a [
     (when (null next)
-      (enqueue (make-pair "Encountered End Of Line After Regular Expression" 'error) error-list))
+      (enqueue (cons "Encountered End Of Line After Regular Expression" 'error) error-list))
 
     (case next-symbol
       (operator (parse-operator next input-stream error-list ast))
       (action-begin (parse-action next input-stream error-list ast))
       (arg-delim (parse-arg next input-stream error-list ast))
-      (otherwise (enqueue (make-pair (string-join "Unknown Or Invalid Token Found After Regular Expression:" next-literal) 'error) error-list))))
-  (make-pair ast error-list))
+      (otherwise (enqueue (cons (string-join "Unknown Or Invalid Token Found After Regular Expression:" next-literal) 'error) error-list))))
+  (cons ast error-list))
 
 (defun parse-arg (token input-stream error-list ast)
   (with-next-token input-stream
 
+    (break (format nil "~a" next))
+
     (when (null next)
-      (enqueue (make-pair (string-join "Encountered End Of Line After Parser Argument" next-literal) 'error) error-list))
+      (enqueue (cons (string-join "Encountered End Of Line After Parser Argument" next-literal) 'error) error-list))
 
     (case next-symbol
       (object-ref (parse-object-ref next input-stream error-list ast))
       (object-primitive (parse-object-primitive next input-stream error-list ast))
       (esc (parse-escape next input-stream error-list ast))
-      (otherwise (enqueue (make-pair (string-join "Unknown Or Invalid Token Found After Regular Expression: " next-literal) 'error) error-list))))
-  (make-pair ast error-list))
+      (otherwise (enqueue (cons (string-join "Unknown Or Invalid Token Found After Regular Expression: " next-literal) 'error) error-list))))
+  (cons ast error-list))
 
 (defun parse-range (token input-stream error-list ast)
   (with-next-token input-stream
 
+    (break (format nil "~a" next))
+
     (when (null next)
-      (enqueue (make-pair "Encountered End Of Line After Parser Range" 'error) error-list))
+      (enqueue (cons "Encountered End Of Line After Parser Range" 'error) error-list))
+
+    ;; (break (format nil "not null ~a" next))
 
     (case next-symbol
-      (object-ref (parse-object-ref token input-stream error-list ast))
-      (object-primitive (parse-object-primitive token input-stream error-list ast))
-      (t (enqueue (make-pair (string-join "Unknown Or Invalid Token Found After Parser Range" next-literal) 'error) error-list))))
-  (make-pair ast error-list))
+      (object-ref (parse-object-ref next input-stream error-list ast))
+      (object-primitive (parse-object-primitive next input-stream error-list ast))
+      (t (enqueue (cons (string-join "Unknown Or Invalid Token Found After Parser Range" next-literal) 'error) error-list))))
+  (cons ast error-list))
 
 (defun parse-action (token input-stream error-list ast)
   (with-next-token input-stream
     (when (null next)
-      (enqueue (make-pair "Encountered End Of Line After Parser Range Or Assignment" 'error) error-list))
+      (enqueue (cons "Encountered End Of Line After Parser Range Or Assignment" 'error) error-list))
 
-      (case next-symbol
-        (object-primitive (parse-object-primitive next input-stream error-list ast))
-        (object-ref (parse-object-ref next input-stream error-list ast))
-        (otherwise (enqueue (make-pair (string-join "Unknown or Invalid Token Found After Parser Action: " next-literal) 'error) error-list))))
-  (make-pair ast error-list))
+    (break "In action ~a" next)
+
+    (case next-symbol
+      (object-primitive (parse-object-primitive next input-stream error-list ast))
+      (object-ref (parse-object-ref next input-stream error-list ast))
+      (otherwise (enqueue (cons (string-join "Unknown or Invalid Token Found After Parser Action: " next-literal) 'error) error-list))))
+  (cons ast error-list))
 
 (defun parse-unknown-token (token input-stream error-list ast)
   (with-next-token input-stream
 
-    (enqueue (make-pair (string-join "Unknown Or Invalid Token Found After Parser Action: " (token-literal token)) 'error) error-list)
+    (enqueue (cons (string-join "Unknown Or Invalid Token Found After Parser Action: " (token-literal token)) 'error) error-list)
     (when (null token)
-      (enqueue (make-pair "Encountered End Of Line After Unknown Token: " 'error) error-list))
+      (enqueue (cons "Encountered End Of Line After Unknown Token: " 'error) error-list))
 
     (case next-symbol
       (uknown-token (parse-unknown-token next input-stream error-list ast))
@@ -194,7 +244,7 @@
 
       (esc (parse-escape next input-stream error-list ast))
       (reader (parse-reader token input-stream error-list ast))))
-  (make-pair ast error-list))
+  (cons ast error-list))
 
 (defun parse-operator (token input-stream error-list ast)
   (let ((stack '())
@@ -213,8 +263,8 @@
             (enqueue tok queue)
           :else :do
             (when (null tok)
-              (enqueue (make-pair "Encountered End Of Line After Operator" 'error) error-list))
-            (enqueue (make-pair (string-join "Unknown Or Invalid Token Found In Expression: " next-literal) 'error) error-list)
+              (enqueue (cons "Encountered End Of Line After Operator" 'error) error-list))
+            (enqueue (cons (string-join "Unknown Or Invalid Token Found In Expression: " next-literal) 'error) error-list)
             (loop-finish))
 
     (loop :for op :in stack :do
@@ -228,20 +278,21 @@
     ;; (when (null next)
     ;;   (report-error (make-parser-error :token token :code -8 :severity 'error)))
     (when (null next)
-      (return-from parse-action-end (box-data ast)))
+      (return-from parse-action-end (box-data (car ast))))
 
     (case next-symbol
-      (action-begin (parse-action token input-stream error-list ast))
-      (object-primitive (parse-action token input-stream error-list ast))
-      (object-ref (parse-action token input-stream error-list ast))
-      (otherwise (enqueue (make-pair (string-join "Unknown or Invalid Token Found After Action End Token: " next-literal) 'error) error-list)))
-    (make-pair ast error-list)))
+      (action-begin (parse-action next input-stream error-list ast))
+      (object-primitive (parse-action next input-stream error-list ast))
+      (object-ref (parse-action next input-stream error-list ast))
+      (otherwise (enqueue (cons (string-join "Unknown or Invalid Token Found After Action End Token: " next-literal) 'error) error-list)))
+    (cons ast error-list)))
 
 (defun parse-reader-end (token input-stream error-list ast)
   (with-next-token input-stream
-    (break "in reader end")
+    (break (format nil "~a" next))
     (case next-symbol
-      (action-begin (parse-action next input-stream error-list ast))
-      (object-primitive (parse-object-primitive next input-stream error-list ast))
-      (object-ref (parse-object-ref next input-stream error-list ast))))
-  (make-pair ast error-list))
+      (action-begin (break "bens")(parse-action next input-stream error-list ast))
+      (object-primitive (break "fuck" (parse-object-primitive next input-stream error-list ast))
+      (object-ref (break "choclate") (parse-object-ref next input-stream error-list ast))
+      (otherwise (enqueue (cons (string-join "Found Unknown Token After Reader End"  next-literal) 'error) error-list))))
+  (cons ast error-list)))
